@@ -1,14 +1,23 @@
-\documentclass{article}
-\usepackage{graphicx} % Required for inserting images
+\documentclass[notitlepage]{report}
+\usepackage{graphicx}
+\usepackage[style=apa]{biblatex}
+\addbibresource{sources.bib}
+\graphicspath{ {./images/} }
+
 
 \title{Entity Matching in Master Data Analytics}
 \author{Tizian Zimmermann}
 \date{November 2025}
 
+
 \begin{document}
 
 \maketitle
+\input{chapters/abstract.tex}
 
 \section{Introduction}
-
+here could be your chapter
+\cite{Example}\footnote{aaaaaaaaaaaaaaaaaaa}.
+\raggedright
+\printbibliography
 \end{document}
