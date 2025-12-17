@@ -1,23 +1,27 @@
-\documentclass[notitlepage]{report}
+\documentclass[runningheads]{llncs}
+\usepackage[T1]{fontenc}
 \usepackage{graphicx}
-\usepackage[style=apa]{biblatex}
-\addbibresource{sources.bib}
 \graphicspath{ {./images/} }
-
-
-\title{Entity Matching in Master Data Analytics}
-\author{Tizian Zimmermann}
-\date{November 2025}
-
 
 \begin{document}
 
-\maketitle
+\title{Entity Matching in Master Data Analytics}
+
+\author{Simon Wilmsen\and
+Oliver Bitter\and
+Tizian Zimmermann \and
+Erik Schreider}
+
+\institute{Ostbayerische Technische Hochschule Regensburg, Seybothstraße 2, 93053 Regensburg}
+
+\maketitle  
+
 \input{chapters/abstract.tex}
 
 \section{Introduction}
-here could be your chapter
-\cite{Example}\footnote{aaaaaaaaaaaaaaaaaaa}.
+Here could be your chapter \cite{Example}\footnote{aaaaaaaaaaaaaaaaaaa}.
 \raggedright
-\printbibliography
+
+\bibliographystyle{splncs04}
+\bibliography{sources}
 \end{document}
