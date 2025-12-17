@@ -1,4 +1,20 @@
 \begin{abstract}
-This is a sample abstract for submitting a proposal for a talk or a poster presentation at WIAM16. You
-should send the tex file and a pdf version of your proposal.
+Entity Matching (EM) is a key task in today’s cloud-based data ecosystems, where data from 
+many heterogeneous sources must be reliably integrated. Recent EM approaches rely on 
+powerful black-box models, which achieve high accuracy but offer little transparency. 
+Existing explainability techniques are rarely applied to EM and face specific challenges: they 
+must cope with heterogeneous representations of entities, large volumes of data, and 
+explanations that often fail to capture the unique semantic characteristics of EM decisions. In 
+this project, we investigate explainable EM by applying black-box explainers such as SHAP, 
+LIME, and related methods to current EM models to one fixed model. 
+
+Concretely, we run a set of benchmark EM datasets through a black-box model, generate 
+local explanations for its duplicate and non-duplicate predictions, and compare these 
+explanation methods with respect to fidelity, stability, and usability. We will further visualize 
+the explanations to make the decision process of the EM model accessible to human users. 
+The overall objective is to implement and evaluate interpretable methods that clearly explain 
+why two records are classified as duplicates or not, thereby increasing trust in EM systems 
+and supporting users in debugging, validating, and improving data integration pipelines. 
+
+\keywords{Entity Matching  \and Explainable AI \and Black-Box.}
 \end{abstract}
