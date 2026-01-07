@@ -169,9 +169,7 @@ print(
     f"\n  Test : {len(test_data)}"
 )
 
-# --- Tokenizer und der Rest des Codes bleiben gleich ---
 tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
-
 
 class EMModel(nn.Module):
     def __init__(self):
@@ -198,6 +196,7 @@ class EMModel(nn.Module):
         return self.classifier(cls)
 
 model = EMModel().to(DEVICE)
+# for param in model.bert.parameters(): param.requires_grad = False
 optimizer = torch.optim.AdamW(model.parameters(), lr=3e-5)
 loss_fn = nn.CrossEntropyLoss()
 
@@ -205,7 +204,7 @@ loss_fn = nn.CrossEntropyLoss()
 def encode_batch(batch):
     texts = [item["text"] for item in batch]
     labels = torch.tensor([item["label"] for item in batch]).to(DEVICE)
-    enc = tokenizer(texts, padding=True, truncation=True, return_tensors="pt").to(DEVICE)
+    enc = tokenizer(texts, padding=True, truncation=True, return_tensors="pt").to(DEVICE) # vllt. noch 'max_length=128' hinzufügen
     return enc, labels
 
 print("\n============================================")
@@ -242,7 +241,7 @@ print(f"\n--- Modell nach dem Training gespeichert unter: {MODEL_PATH} ---")
 def forward_embeds_wrapper(embeddings, attention_mask, token_type_ids=None):
     return model.forward_embeds(embeddings, attention_mask, token_type_ids)
 
-ig = IntegratedGradients(forward_embeds_wrapper)
+ig = IntegratedGradients(forward_embeds_wrapper) # evtl. lieber GradientShap, Saliency etc.
 
 def attribute_text(text, target_label=1):
     enc = tokenizer(text, return_tensors="pt", truncation=True, padding=True).to(DEVICE)
@@ -259,7 +258,7 @@ def attribute_text(text, target_label=1):
         baselines=baseline,
         target=target_label, 
         additional_forward_args=(attention_mask, token_type_ids),
-        n_steps=50 
+        n_steps=50 # bei CPU eher 10. 50 ist da wohl zu viel
     )
 
     token_attrib = attributions.sum(dim=2).squeeze().detach().cpu().tolist()
@@ -300,4 +299,5 @@ zu erledigen:
 - ausgereifte Erklärungen (da evtl. mit chatbot-Einbindung)
 - Accuracy evaluieren (da model prediction mit label vergleichen und einen correct-Score mitführen und am ende ausgeben)
 - evtl. bessere Visualisierung
+
 '''
