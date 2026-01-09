@@ -1,19 +1,33 @@
 import torch
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from transformers import AutoTokenizer
 from captum.attr import IntegratedGradients
+import os
 
-from model.bert_model_train import test_data
+from data_loader import load_data_from_file, infer_left_right_columns_from_csv
+from bert_model_train import EMModel
 
-MODEL_NAME = "em_bert_model"
+# Pfade relativ zur aktuellen Skriptdatei
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH = os.path.abspath(os.path.join(SCRIPT_DIR, "../models/em_bert_model.pt"))
+DATASET_PATH = os.path.abspath(os.path.join(SCRIPT_DIR, "datasets/"))
 
 # Device
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Lade Tokenizer und Modell
-tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME)
+tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
+model = EMModel()
+model.load_state_dict(torch.load(MODEL_PATH, map_location=DEVICE))
 model.to(DEVICE)
 model.eval()
+
+# Lade Testdaten
+LEFT_COLS, RIGHT_COLS = infer_left_right_columns_from_csv(os.path.join(DATASET_PATH, "test_short.csv"))
+test_data = load_data_from_file(
+    os.path.join(DATASET_PATH, "test_short.csv"),
+    text_cols_left=LEFT_COLS,
+    text_cols_right=RIGHT_COLS
+)
 # 5. Captum: Integrated Gradients für Erklärbarkeit
 
 def forward_embeds_wrapper(embeddings, attention_mask, token_type_ids=None):

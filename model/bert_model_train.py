@@ -41,35 +41,39 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer,
                               encoding='utf-8')  # evtl lieber nicht buffern, da man sonst erst am ende was sieht...
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-MODEL_PATH = "models/em_bert_model.pt"
+
+# Pfade relativ zur aktuellen Skriptdatei
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH = os.path.abspath(os.path.join(SCRIPT_DIR, "../models/em_bert_model.pt"))
+DATASET_PATH = os.path.abspath(os.path.join(SCRIPT_DIR, "datasets/"))
+
 BATCH_SIZE = 16  # bei cpu-training weniger (4 oder 8)
 NUM_EPOCHS = 3  # mehr wäre eig nice, aber des dauert bei mir viel zu lange. Man könnte die Dateigröße reduzieren...
-DATASET_PATH = "datasets/"
 
 print("Device:", DEVICE)
 print(f"Modell wird gespeichert unter: {MODEL_PATH}")
 
 try:
-    LEFT_COLS, RIGHT_COLS = infer_left_right_columns_from_csv(DATASET_PATH + "train.csv")
+    LEFT_COLS, RIGHT_COLS = infer_left_right_columns_from_csv(os.path.join(DATASET_PATH, "train_short.csv"))
 
     print("Automatisch erkannte Spalten:")
     print("LEFT_COLS :", LEFT_COLS)
     print("RIGHT_COLS:", RIGHT_COLS)
 
     train_data = load_data_from_file(
-        DATASET_PATH + "train.csv",
+        os.path.join(DATASET_PATH, "train_short.csv"),
         text_cols_left=LEFT_COLS,
         text_cols_right=RIGHT_COLS
     )
 
     valid_data = load_data_from_file(
-        DATASET_PATH + "valid.csv",
+        os.path.join(DATASET_PATH, "valid_short.csv"),
         text_cols_left=LEFT_COLS,
         text_cols_right=RIGHT_COLS
     )
 
     test_data = load_data_from_file(
-        DATASET_PATH + "test.csv",
+        os.path.join(DATASET_PATH, "test_short.csv"),
         text_cols_left=LEFT_COLS,
         text_cols_right=RIGHT_COLS
     )
