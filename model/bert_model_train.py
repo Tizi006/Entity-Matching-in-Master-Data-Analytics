@@ -54,7 +54,7 @@ print("Device:", DEVICE)
 print(f"Modell wird gespeichert unter: {MODEL_PATH}")
 
 try:
-    LEFT_COLS, RIGHT_COLS = infer_left_right_columns_from_csv(os.path.join(DATASET_PATH, "train_short.csv"))
+    LEFT_COLS, RIGHT_COLS = infer_left_right_columns_from_csv(os.path.join(DATASET_PATH, "train.csv"))
 
     print("Automatisch erkannte Spalten:")
     print("LEFT_COLS :", LEFT_COLS)
