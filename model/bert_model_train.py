@@ -61,19 +61,19 @@ try:
     print("RIGHT_COLS:", RIGHT_COLS)
 
     train_data = load_data_from_file(
-        os.path.join(DATASET_PATH, "train_short.csv"),
+        os.path.join(DATASET_PATH, "train.csv"),
         text_cols_left=LEFT_COLS,
         text_cols_right=RIGHT_COLS
     )
 
     valid_data = load_data_from_file(
-        os.path.join(DATASET_PATH, "valid_short.csv"),
+        os.path.join(DATASET_PATH, "valid.csv"),
         text_cols_left=LEFT_COLS,
         text_cols_right=RIGHT_COLS
     )
 
     test_data = load_data_from_file(
-        os.path.join(DATASET_PATH, "test_short.csv"),
+        os.path.join(DATASET_PATH, "test.csv"),
         text_cols_left=LEFT_COLS,
         text_cols_right=RIGHT_COLS
     )
