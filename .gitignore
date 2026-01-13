@@ -14,6 +14,5 @@
 *.bcf
 *.pdf
 #main.pdf
-EMCode/models/em_bert_model.pt
 EMCode/__pycache__/data_loader.cpython-311.pyc
 EMCode/__pycache__/bert_model_train.cpython-311.pyc
