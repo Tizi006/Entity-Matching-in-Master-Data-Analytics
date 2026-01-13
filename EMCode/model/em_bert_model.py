@@ -29,3 +29,14 @@ class EMModel(nn.Module):
         )
         cls = outputs.last_hidden_state[:, 0, :]
         return self.classifier(cls)
+
+    def encode(self, input_ids=None, attention_mask=None, token_type_ids=None, embeddings=None):
+        """
+        Gibt das CLS-Embedding (batch, embed_dim) zurück.
+        Akzeptiert entweder bereits berechnete `embeddings` oder `input_ids`.
+        """
+        if embeddings is None:
+            if input_ids is None:
+                raise ValueError("Provide `input_ids` or `embeddings` to encode().")
+            embeddings = self.embeddings(input_ids)
+        return embeddings[:, 0, :]
