@@ -32,9 +32,9 @@ that is compatible with your CUDA installation.
 Install all required packages using:
 
 ```bash
-pip install -r requirements.txt
+pip install -r EmCode/requirements.txt
 ```
-or manually install them via pip:
+or manually install the most important packages via pip:
 
 ```bash
 pip install -q transformers captum pandas
