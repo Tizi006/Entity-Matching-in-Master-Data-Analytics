@@ -4,7 +4,7 @@ from captum.attr import IntegratedGradients
 import os
 
 from EMCode.scripts.data_loader import load_data_from_file, infer_left_right_columns_from_csv, project_root
-from EMCode.scripts.bert_model_train import EMModel
+from EMCode.model.em_bert_model import EMModel
 
 # Pfade relativ zur aktuellen Root
 ROOT = project_root()
