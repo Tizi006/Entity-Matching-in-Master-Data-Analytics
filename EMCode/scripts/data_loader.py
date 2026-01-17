@@ -127,3 +127,29 @@ def get_dataloader(
 ) -> DataLoader:
     collate = collate_fn_factory(tokenizer, max_length=max_length, device=device)
     return DataLoader(formatted_data, batch_size=batch_size, shuffle=shuffle, collate_fn=collate)
+
+
+def load_filtered_data(file_path: str, label_filter: Optional[int] = None):
+    """
+    Loads and filters data from a CSV/JSONL file for EMModel.
+
+    Args:
+        file_path (str): Path to CSV or JSONL file.
+        label_filter (int, optional): If 0 or 1, returns only rows with this label.
+                                      If None, returns all rows.
+
+    Returns:
+        List[Dict]: Formatted and optionally filtered dataset, each item like:
+                    {"text": "<left columns> || <right columns>", "label": 0/1}
+    """
+    left_cols, right_cols = infer_left_right_columns_from_csv(file_path)
+    all_data = load_data_from_file(file_path, text_cols_left=left_cols, text_cols_right=right_cols)
+
+    if label_filter in [0, 1]:
+        filtered_data = [row for row in all_data if row["label"] == label_filter]
+    else:
+        filtered_data = all_data
+
+    print(f"Loaded {len(filtered_data)} samples from {file_path} "
+          f"({'filtered by label ' + str(label_filter) if label_filter is not None else 'all labels'})")
+    return filtered_data
