@@ -1,23 +1,23 @@
 import os
 
 import textattack
-import torch
 from transformers import AutoTokenizer
-
 from textattack.attack_recipes import TextFoolerJin2019
 from textattack import Attacker
 from textattack.datasets import Dataset
 from textattack.models.wrappers import ModelWrapper
 from textattack.constraints.overlap import MaxWordsPerturbed
-#from textattack.constraints.pre_transformation import WordRegexSubstitution
+import gc
 
 from EMCode.model.em_bert_model import EMModel
 from EMCode.scripts.data_loader import *
+from EMCode.scripts.render_results import attack_results_to_html, aggregate_field_frequencies, plot_field_heatmap
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 ROOT = project_root()
 MODEL_PATH = os.path.abspath(os.path.join(ROOT, "models/em_bert_model.pt"))
 DATASET_PATH = os.path.abspath(os.path.join(ROOT, "datasets/test.csv"))
+FIELDS = ["authors_2", "title_2", "venue_2", "year_2"]
 
 
 def load_model(model_path):
@@ -69,7 +69,46 @@ class SpanPerturbationWrapper(ModelWrapper):
             outputs = self.model(**enc)
             logits = outputs.logits if hasattr(outputs, "logits") else outputs
 
-        return logits.cpu().numpy()
+        return logits.detach().cpu().numpy()
+
+
+def run_span_attack(
+        model_wrapper,
+        dataset
+):
+    """
+    Runs a TextFooler attack on a span-based wrapper.
+
+    Args:
+        dataset: data to attack
+        model_wrapper: your EM model stack wrapped data
+    """
+
+    attack = TextFoolerJin2019.build(model_wrapper)
+
+    # Optimisations
+    # Only 10% of tokens changed to cause a flip
+    max_words = MaxWordsPerturbed(max_percent=0.15)
+    attack.constraints.append(max_words)
+
+    attack_args = textattack.AttackArgs(
+        num_examples=len(dataset),
+        disable_stdout=False,
+    )
+
+    attacker = Attacker(attack, dataset, attack_args)
+    results = attacker.attack_dataset()
+
+    # Memory cleanup
+    del attacker
+    del attack
+    torch.cuda.empty_cache()
+    gc.collect()
+
+    for res in results:
+        print(res)
+
+    return results
 
 
 def main():
@@ -77,48 +116,37 @@ def main():
     tokenizer, model = load_model(MODEL_PATH)
 
     test_data = load_filtered_data(DATASET_PATH, 1)
+    all_attack_results = []
 
-    sides = test_data[10]["text"].split(" || ")
-    left_fixed = sides[0]
-    right_orig = sides[1]
-    label = test_data[10]["label"]
+    for i in range(10):
+        label = test_data[i]["label"]
 
-    template = f"{left_fixed} || {{}}"
+        sides = test_data[i]["text"].split(" || ")
+        left_fixed = sides[0]
+        right_orig = sides[1]
 
-    dataset = Dataset(
-        [(right_orig, label)]
-    )
+        template = f"{left_fixed} || {{}}"
 
-    model_wrapper = SpanPerturbationWrapper(
-        model=model,
-        tokenizer=tokenizer,
-        template=template,
-        device=device
-    )
+        dataset = Dataset([(right_orig, label)])
 
-    attack = TextFoolerJin2019.build(model_wrapper)
+        model_wrapper = SpanPerturbationWrapper(
+            model=model,
+            tokenizer=tokenizer,
+            template=template,
+            device=device,
+        )
 
-    # Optimisations
-    # Only 10% of tokens changed to cause a flip
-    max_words = MaxWordsPerturbed(max_percent=0.10)
-    attack.constraints.append(max_words)
+        attack_results = run_span_attack(model_wrapper, dataset)
+        all_attack_results.extend(attack_results)
 
-    # Blocking out Years
-    #attack.constraints.append(
-    #    WordRegexSubstitution(r"\b\d{4}\b")
-    #)
+    attack_results_to_html(all_attack_results)
+
+    field_freq_mean = aggregate_field_frequencies(all_attack_results, FIELDS)
+    plot_field_heatmap(field_freq_mean, "field_level_heatmap.png")
 
     # test only filed aware (only one filed to flip)
     # right_title = extract_field(right_orig, "title_2")
     # right_venue = extract_field(right_orig, "venue_2")
-
-    attack_args = textattack.AttackArgs(num_examples=1, disable_stdout=False, log_to_csv="counter_factual_results.csv")
-    attacker = Attacker(attack, dataset, attack_args)
-
-    results = attacker.attack_dataset()
-    for res in results:
-        print(res)
-
 
 
 
