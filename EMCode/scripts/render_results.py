@@ -215,3 +215,57 @@ def plot_field_heatmap(field_freq_mean, output_path="field_heatmap.png"):
     plt.savefig(output_path, dpi=300)
     plt.close()
     print(f"Saved field-level heatmap: {output_path}")
+
+
+def aggregate_field_frequencies_1d(attack_results, fields):
+    """
+    Returns dict: field -> mean token-level change probability
+    """
+    logger = CSVLogger(color_method="html")
+    for result in attack_results:
+        if isinstance(result, SuccessfulAttackResult):
+            logger.log_attack_result(result)
+            # Add the true original text from AttackResult
+            logger.row_list[-1]['true_original_text'] = result.original_result.attacked_text.text
+
+    df = pd.DataFrame.from_records(logger.row_list)
+
+    field_masks = {f: [] for f in fields}
+
+    for _, row in df.iterrows():
+        original_text = row["true_original_text"]
+        perturbed_html = row["original_text"]
+
+        changed_tokens = get_changed_tokens_from_html(perturbed_html)
+        field_contents = extract_fields(original_text, fields)
+
+        for f, content in field_contents.items():
+            # remove punctuation, split tokens
+            tokens = [t for t in content.replace(",", "").split()]
+            mask = [1 if t in changed_tokens else 0 for t in tokens]
+            field_masks[f].append(mask)
+
+    # Compute mean probability per field
+    field_scores = {}
+    for f in fields:
+        ratios = [np.sum(m) / len(m) for m in field_masks[f] if len(m) > 0]
+        field_scores[f] = float(np.mean(ratios)) if ratios else 0.0
+    logger.flush()
+
+    return field_scores
+
+
+def plot_field_heatmap_1d(field_scores, output_path="field_heatmap_1d.png"):
+    fields = list(field_scores.keys())
+    values = np.array([field_scores[f] for f in fields]).reshape(-1, 1)
+
+    plt.figure(figsize=(4, 2 + len(fields)*0.6))
+    plt.imshow(values, cmap="Reds", aspect="auto")
+    plt.colorbar(label="Probability of Change")
+    plt.yticks(range(len(fields)), fields)
+    plt.xticks([])
+    plt.title("Field-level Attack Sensitivity")
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=300)
+    plt.close()
+    print(f"Saved 1D field heatmap: {output_path}")

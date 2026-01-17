@@ -11,7 +11,8 @@ import gc
 
 from EMCode.model.em_bert_model import EMModel
 from EMCode.scripts.data_loader import *
-from EMCode.scripts.render_results import attack_results_to_html, aggregate_field_frequencies, plot_field_heatmap
+from EMCode.scripts.render_results import (attack_results_to_html, aggregate_field_frequencies, plot_field_heatmap,
+                                           plot_field_heatmap_1d, aggregate_field_frequencies_1d)
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 ROOT = project_root()
@@ -118,7 +119,7 @@ def main():
     test_data = load_filtered_data(DATASET_PATH, 1)
     all_attack_results = []
 
-    for i in range(10):
+    for i in range(200):
         label = test_data[i]["label"]
 
         sides = test_data[i]["text"].split(" || ")
@@ -142,12 +143,10 @@ def main():
     attack_results_to_html(all_attack_results)
 
     field_freq_mean = aggregate_field_frequencies(all_attack_results, FIELDS)
-    plot_field_heatmap(field_freq_mean, "field_level_heatmap.png")
+    plot_field_heatmap(field_freq_mean)
 
-    # test only filed aware (only one filed to flip)
-    # right_title = extract_field(right_orig, "title_2")
-    # right_venue = extract_field(right_orig, "venue_2")
-
+    field_scores = aggregate_field_frequencies_1d(all_attack_results, FIELDS)
+    plot_field_heatmap_1d(field_scores)
 
 
 if __name__ == "__main__":
