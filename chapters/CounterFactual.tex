@@ -1,0 +1,160 @@
+\section{Counterfactual Explanations for Entity Matching}
+
+\subsection{Motivation and Scope of the Method}
+
+
+Counterfactual explanations provide a natural and user-centric approach to explaining individual model decisions. 
+In general, a counterfactual explanation answers the question: 
+\emph{``What is the smallest change to the input that would change the model's prediction?''} 
+Formally, given a black-box model and an input instance, a counterfactual is defined as a minimally perturbed instance 
+that flips the original prediction \cite{Wang2022Minun}.
+
+In this work, we focus on counterfactual explanations generated through minimal textual perturbations of entity records, producing \emph{local} 
+explanations for individual record pairs rather than global model interpretability, following prior work in entity matching \cite{Wang2022Minun}.
+
+\subsection{Counterfactual Generation via Adversarial Text Perturbations}
+
+To generate counterfactual explanations for entity matching decisions, we adopt an adversarial text perturbation approach. 
+Although adversarial examples are traditionally used to evaluate model robustness, they can be reinterpreted as 
+counterfactual explanations, as they represent minimally modified inputs that alter the model's prediction.
+
+Unlike prior work that relies on explicit search over token-level edit operations \cite{Wang2022Minun}, 
+our approach leverages adversarial perturbation mechanisms to efficiently identify influential textual spans. 
+These perturbations are not intended to expose model vulnerabilities, but to reveal which input attributes 
+are most critical for a given matching decision.
+
+By interpreting adversarial perturbations as counterfactual explanations, the proposed method provides concrete 
+and human-readable insights into model behavior. The resulting counterfactuals demonstrate how small variations 
+in textual attributes can change entity matching outcomes, supporting transparency and informed decision-making 
+in master data management.
+
+\subsection{Implementation Details}
+\subsubsection{Model Wrapping and Input Representation}
+The counterfactual explanation method is implemented on top of our previosly defined balack box model. 
+To enable counterfactual generation using adversarial text perturbations, 
+the model is integrated into the TextAttack framework through a custom model wrapper.
+
+Entity record pairs are serialized into a single textual sequence following the input format used during model training. 
+The two records are concatenated using a fixed delimiter, preserving attribute boundaries and field order. 
+This textual representation allows the application of natural language perturbation methods while maintaining 
+compatibility with the underlying transformer model.
+
+
+\subsubsection{Span-based Perturbation Strategy}
+
+A key design choice in our implementation is the use of a span-based model wrapper that restricts perturbations 
+to a specific portion of the input text. Concretely, only one side of the entity pair is treated as mutable, 
+while the other record remains fixed throughout the attack. This is achieved via a template-based input with 
+a single placeholder marking the mutable span, which is modified during counterfactual generation using the 
+TextAttack framework \cite{morris2020textattack}.
+
+Restricting perturbations to a single span provides several advantages for explainability. It enforces locality, 
+ensuring that counterfactuals are driven by minimal, focused changes rather than distributed modifications 
+across both records. It preserves the semantic integrity of the fixed record, serving as a stable reference 
+for interpretation, and aligns with practical workflows, where corrections are typically applied to individual records.
+
+By design, this strategy supports attribute-level interpretability: perturbations can be traced to specific fields, 
+such as names, titles, or authors. This enables a clear mapping between changes and their impact on the model's 
+duplicate decision, producing concise and actionable explanations suitable for diagnostic analysis and data quality improvement.
+
+\subsubsection{Attack Configuration and Constraints}
+
+The counterfactual generation process relies on the TextFooler attack implemented in TextAttack \cite{morris2020textattack}. 
+TextFooler iteratively replaces influential tokens in the mutable span with semantically similar alternatives 
+to flip the model's prediction. In our setting, a successful attack corresponds to a counterfactual explanation: 
+a minimal textual change that alters the entity matching decision.
+
+
+To ensure interpretability and plausibility, we impose several constraints on the attack. First, 
+the proportion of perturbed tokens is limited to a maximum of 15\% of the mutable span. This sparsity 
+constraint encourages minimal modifications, which enhances the readability and usability of the 
+resulting explanations. Second, semantic similarity is enforced during substitution: 
+candidate tokens must be sufficiently similar to the original token in meaning, preserving the overall 
+integrity of the record. These constraints collectively prevent unrealistic or overly aggressive 
+perturbations that could obscure the underlying reasoning of the model.
+
+The attack is executed on a per-record basis. Each example consists of a single mutable span paired 
+with the fixed comparison record. This localized setup ensures that counterfactuals are directly 
+attributable to specific attributes and do not introduce ambiguity arising from simultaneous 
+modifications to both records.
+
+\subsection{Results and Analysis}
+\subsubsection{Qualitative Counterfactual Examples}
+To illustrate the behavior of our counterfactual explanation method, we present a set of 
+qualitative examples generated using TextFooler. Figure~\ref{fig:qual_cf_examples} shows 
+several entity record pairs with minimal perturbations. The left column displays 
+the original records, while the right column contains the perturbed texts produced by the attack. 
+Each perturbation represents a counterfactual explanation: a small, targeted change that flips 
+the model's duplicate/non-duplicate prediction.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{images/counterfactual_examples.png}
+    \caption{Qualitative examples of counterfactual explanations.}
+    \label{fig:qual_cf_examples}
+\end{figure}
+
+From the examples, it can be observed that small changes to author names, 
+titles, and other textual fields are often sufficient to alter the model's 
+decision.
+
+Overall, these qualitative examples highlight the ability of our method to generate 
+and human-readable explanations. By focusing on minimal, attribute-level perturbations, 
+the generated counterfactuals reveal actionable insights about the entity matching model's 
+decision-making process.
+
+\subsubsection{Quantitative Analysis}
+In addition to qualitative examples, we performed a quantitative analysis of the generated 
+counterfactual explanations to assess which attributes most strongly influence the entity 
+matching model. For this purpose, perturbations were aggregated across all record pairs, 
+and the frequency of token changes was computed for each field, such as authors, title, venue, and year. 
+These aggregated frequencies were then visualized using heatmaps to provide an at-a-glance view of attribute-level importance.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{images/field_heatmap_200.png}
+    \caption{Heatmap of token perturbation frequencies across different record attributes.}
+    \label{fig:field_heatmap}
+\end{figure}
+
+Figure~\ref{fig:field_heatmap} shows that textual attributes such as \textit{title} and \textit{venue} 
+are perturbed most frequently, indicating the model relies heavily on these fields for duplicate 
+predictions. Numeric or categorical fields, such as \textit{year}, are less often changed, suggesting 
+lower influence.
+
+While these aggregated frequencies provide a convenient global overview, they reflect the accumulation 
+of local explanations and may not fully represent the true global importance of each field across all 
+model decisions.
+
+\subsection{Discussion and Limitations}
+
+This work adopts an adversarial search formulation, as implemented in TextAttack, where counterfactuals are generated 
+via iterative, query-based perturbations of individual inputs \cite{morris2020textattack}. As a result, 
+explanations are inherently local and computed on a single record pair at a time. Although this implies an 
+effective batch size of one, this behavior follows directly from the attack design and is appropriate for 
+producing fine-grained counterfactual explanations rather than high-throughput inference.
+
+A second limitation is that adversarial token substitutions may occasionally introduce semantically implausible changes. 
+While similarity and sparsity constraints mitigate this issue, counterfactuals should be interpreted as indicators 
+of model sensitivity rather than guaranteed realistic edits.
+
+Finally, the method primarily targets textual attributes and is therefore less informative for numeric or categorical fields, 
+which are rarely perturbed. However, this limitation is less critical in the context of the used dataset (e.g., \textit{[Dataset Name]}), 
+which is dominated by rich textual attributes such as authors, titles, and venues, making text-based counterfactual generation 
+both feasible and meaningful. While aggregating local explanations can reveal broader patterns, such summaries do not fully capture 
+dataset-wide importance or complex attribute interactions.
+
+Despite these limitations, the approach is well suited for counterfactual argumentation in entity matching, as it produces clear, 
+localized explanations that expose model sensitivities and support interpretable decision analysis.
+
+
+\subsection{Summary}
+
+We presented a method for generating span-based counterfactual explanations for entity matching models, 
+producing minimal changes to individual records that reveal attribute-level influence. 
+Qualitative examples show how small edits to fields like authors or titles can alter predictions, 
+while heatmaps highlight the most critical attributes. 
+
+Despite limitations such as computational cost and occasional semantic drift, the approach 
+provides interpretable insights that support data cleaning and enhance transparency, trust, 
+and understanding of model decisions.
