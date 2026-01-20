@@ -24,7 +24,7 @@ model.to(DEVICE)
 model.eval()
 
 # Lade Testdaten
-LEFT_COLS, RIGHT_COLS = infer_left_right_columns_from_csv(os.path.join(DATASET_PATH, "test_short.csv"))
+LEFT_COLS, RIGHT_COLS = infer_left_right_columns_from_csv(os.path.join(DATASET_PATH, "test_medium.csv"))
 test_data = load_data_from_file(
     os.path.join(DATASET_PATH, "test_short.csv"),
     text_cols_left=LEFT_COLS,
@@ -263,10 +263,6 @@ print("Analyse der Erklärbarkeit (Integrated Gradients)")
 print("============================================")
 
 # --- Statistischer Vergleich der Baselines ---
-print("\n" + "="*50)
-print("STATISTISCHE EVALUATION DER BASELINES")
-print("="*50)
-
 baseline_stats = evaluate_baseline_quality(test_data)
 best_baseline = min(baseline_stats, key=lambda k: baseline_stats[k]["avg_delta"])
 print(f"Empfohlene Baseline für Analyse: {best_baseline.upper()}")
