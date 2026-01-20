@@ -26,7 +26,7 @@ model.eval()
 # Lade Testdaten
 LEFT_COLS, RIGHT_COLS = infer_left_right_columns_from_csv(os.path.join(DATASET_PATH, "test_medium.csv"))
 test_data = load_data_from_file(
-    os.path.join(DATASET_PATH, "test_short.csv"),
+    os.path.join(DATASET_PATH, "test_medium.csv"),
     text_cols_left=LEFT_COLS,
     text_cols_right=RIGHT_COLS
 )
@@ -133,7 +133,7 @@ def attribute_text(text, target_label=1, baseline_type="pad"):
         baselines=baseline,
         target=target_label,
         additional_forward_args=(attention_mask, token_type_ids),
-        n_steps=100,  # 50-200 ist sehr teuer für cpu
+        n_steps=10,  # 50-200 ist sehr teuer für cpu
         return_convergence_delta=True
     )
 
