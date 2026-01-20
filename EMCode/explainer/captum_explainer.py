@@ -24,9 +24,9 @@ model.to(DEVICE)
 model.eval()
 
 # Lade Testdaten
-LEFT_COLS, RIGHT_COLS = infer_left_right_columns_from_csv(os.path.join(DATASET_PATH, "test_medium.csv"))
+LEFT_COLS, RIGHT_COLS = infer_left_right_columns_from_csv(os.path.join(DATASET_PATH, "test_20.csv"))
 test_data = load_data_from_file(
-    os.path.join(DATASET_PATH, "test_medium.csv"),
+    os.path.join(DATASET_PATH, "test_20.csv"),
     text_cols_left=LEFT_COLS,
     text_cols_right=RIGHT_COLS
 )
