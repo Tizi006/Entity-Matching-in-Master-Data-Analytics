@@ -1,0 +1,67 @@
+\section{Related Work}
+The evolution of Entity Matching (EM) has 
+transitioned from classic probabilistic 
+record linkage to modern neural matching. 
+The seminal work by Mudgal et al. \cite{deepmatcher} 
+established the "Design Space" of Deep 
+Learning for EM, demonstrating that 
+neural architectures could outperform 
+traditional classifiers by automatically 
+learning attribute summaries.
+
+Simultaneously, the field of Explainable 
+AI (XAI) has matured significantly. 
+Ribeiro et al. \cite{lime} introduced 
+\textbf{LIME}, which explains predictions 
+by locally approximating the black-box with 
+an interpretable linear surrogate. 
+Lundberg and Lee \cite{shap} further 
+advanced the field with \textbf{SHAP}, 
+leveraging coalitional game theory 
+to provide additive feature attribution.
+
+In the specific context of EM, recent 
+literature has shifted from general-purpose 
+explainers to domain-specific systems. 
+Singh et al. \cite{exmatchina2021} 
+introduced \textit{ExMatchina}, which 
+adapts local explanations to the 
+tabular nature of record pairs. 
+Building on this, \textbf{Thirumuruganathan et al. (2022)} 
+\cite{thirumuruganathan2022} conducted 
+a comprehensive study benchmarking these 
+explainers and introduced \textit{Landmark}, 
+a specialized explainer for EM. While 
+their work provides a significant baseline, 
+it primarily focuses on feature importance 
+weights generated via random or 
+heuristic-based perturbations.
+
+
+
+Most recently, \textbf{Paganelli et al. (2024)} 
+proposed \textbf{CREW} \cite{CREW2024}, an 
+explanation system that addresses the 
+complexity of verbose token-level 
+explanations by clustering words based on 
+semantic similarity. 
+
+Our work diverges from and extends these 
+established frameworks in two key 
+dimensions. First, unlike the 
+attribution-centric focus of 
+\cite{thirumuruganathan2022}, we prioritize 
+\textbf{Counterfactual Explanations} 
+\cite{wachter2017} through an adversarial 
+search paradigm. By utilizing 
+\textit{TextFooler} within the 
+\textit{TextAttack} framework, we identify 
+exact textual flips rather than 
+approximate weights. Second, we introduce 
+a \textbf{Span-based locality constraint} 
+that fixes one record as a "golden" 
+reference. This addresses a practical 
+gap in existing literature, mirroring 
+real-world master data workflows where 
+an incoming record is validated against 
+a static, trusted source.

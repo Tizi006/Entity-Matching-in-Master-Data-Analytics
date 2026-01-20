@@ -1,30 +1,19 @@
 \section{Introduction}
-Entity Matching (EM), the task of identifying records that refer to the same real-world entity, is a cornerstone of modern data integration pipelines. As organizations increasingly migrate to cloud-based data ecosystems, the necessity of consolidating heterogeneous data sources has become paramount. While traditional EM approaches relied on heuristic rules or manual feature engineering, the state-of-the-art has shifted toward deep learning architectures. Models such as \textit{DeepMatcher} utilize bidirectional Gated Recurrent Units (GRUs) and attention mechanisms to achieve unprecedented accuracy in identifying duplicates across noisy datasets.
+Entity Matching (EM), the task of identifying records that refer to the same real-world entity, is a cornerstone of modern data integration pipelines.
+As organizations increasingly migrate to cloud-based data ecosystems, the necessity of consolidating heterogeneous data sources has become paramount.
+ While traditional EM approaches relied on heuristic rules or manual feature engineering, the state-of-the-art has shifted toward deep learning architectures.
+Models such as \textit{DeepMatcher} utilize bidirectional Gated Recurrent Units (GRUs) and attention mechanisms to achieve unprecedented accuracy in identifying duplicates across noisy datasets.
 
 
-Despite these performance gains, these models operate as "black boxes." Their decision-making processes are embedded within high-dimensional vector spaces and non-linear transformations, offering no inherent transparency. In industrial applications, this lack of interpretability poses significant risks, particularly regarding data governance, accountability, and the "right to explanation" under regulatory frameworks like the GDPR \cite{Araujo2025Fairness}.
+Despite these performance gains, these models operate as "black boxes." Their decision-making processes are embedded within high-dimensional
+vector spaces and non-linear transformations, offering no inherent transparency. In industrial applications, this lack of interpretability
+poses significant risks, particularly regarding data governance, accountability, and the "right to explanation"
+under regulatory frameworks like the GDPR \cite{Araujo2025Fairness}.
 
-This research addresses the transparency-performance tradeoff by evaluating post-hoc explainability techniques applied to a fixed EM model. We investigate the efficacy of \textbf{LIME} (Local Interpretable Model-agnostic Explanations), \textbf{SHAP} (Shapley Additive Explanations), and \textbf{Similarity Attribution}. By benchmarking these methods against established EM datasets, we provide a comparative analysis of their \textit{fidelity}, \textit{stability}, and \textit{usability}. The goal is to establish a framework that not only identifies duplicates but also justifies the underlying logic, thereby facilitating system debugging and increasing stakeholder trust.
-
-
-
-\section{Related Work}
-The evolution of Entity Matching can be traced from classic probabilistic record linkage to modern neural matching. The seminal work by Mudgal et al. (2018) established the "Design Space" of Deep Learning for EM, demonstrating that neural architectures could outperform traditional classifiers by automatically learning attribute summaries.
-
-Simultaneously, the field of Explainable AI (XAI) has matured significantly. Ribeiro et al. (2016) introduced \textbf{LIME}, a method that explains predictions by locally approximating the black-box with an interpretable linear surrogate. Lundberg and Lee (2017) further advanced the field with \textbf{SHAP}, which leverages coalitional game theory to provide a unique, additive feature attribution method that satisfies desirable properties such as consistency and local accuracy.
-
-The intersection of XAI and EM is a relatively nascent but critical area of study. Recent efforts, such as \textit{ExMatchina} (Singh et al., 2021), have begun to tailor model-agnostic explainers specifically for the textual and tabular characteristics of entity pairs. Our work builds upon these foundations by comparing multiple attribution methods on a single fixed model to isolate the strengths and weaknesses of each explainer in the specific context of heterogeneous master data.
+This research addresses the transparency-performance tradeoff by evaluating post-hoc explainability techniques applied to a fixed EM model.
+We investigate the efficacy of \textbf{LIME} (Local Interpretable Model-agnostic Explanations), \textbf{SHAP} (Shapley Additive Explanations),
+and \textbf{Similarity Attribution}. By benchmarking these methods against established EM datasets, we provide a comparative analysis of their \textit{fidelity}, \textit{stability}, and \textit{usability}. 
+The goal is to establish a framework that not only identifies duplicates but also justifies the underlying logic, thereby facilitating system debugging and increasing stakeholder trust.
 
 
 
-\section{Methodology}
-Our experimental framework utilizes \textit{DeepMatcher} as the primary black-box model. We focus on three distinct categories of feature attribution:
-
-\subsection{SHAP (Shapley Additive Explanations)}
-SHAP values are calculated by evaluating the model's output across all possible permutations of input features (attributes). For EM, this involves determining how the inclusion or exclusion of an attribute, such as "Product Name" or "Manufacturer," influences the probability of a match relative to the average prediction.
-
-\subsection{LIME (Local Interpretable Model-agnostic Explanations)}
-LIME generates explanations by perturbing the tokens of a specific record pair and training a weighted linear model on the resulting predictions. This allows us to identify the specific tokens (e.g., a specific serial number or SKU) that serve as the primary drivers for a "Match" or "Non-Match" classification.
-
-\subsection{Similarity Attribution}
-Unlike model-agnostic tools, Similarity Attribution evaluates the internal similarity vectors generated during the \textit{Attribute Comparison} phase of the neural network. By analyzing the gradients or weights of these vectors, we can attribute the final decision to the degree of similarity found in specific fields, providing a more structural explanation than perturbation-based methods.

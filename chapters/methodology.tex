@@ -1,0 +1,65 @@
+\section{Methodology}
+Our experimental framework utilizes \textit{DeepMatcher} 
+as the primary black-box model. We focus on three 
+distinct categories of feature attribution and 
+instance-based explanations to evaluate the 
+transparency-performance trade-off in Entity Matching. 
+The objective is to identify which method provides 
+the highest \textbf{fidelity} while maintaining 
+computational \textbf{efficiency} suitable for 
+large-scale master data.
+
+\subsection{SHAP (Shapley Additive Explanations)}
+SHAP, introduced by Lundberg and Lee \cite{shap}, is 
+rooted in cooperative game theory. It calculates 
+the marginal contribution of each attribute (e.g., 
+"Product Name") across all possible feature 
+permutations. We employ SHAP to achieve 
+mathematically consistent importance scores. While 
+theoretically superior in accuracy, its 
+computational complexity is a primary concern 
+for our benchmark comparison.
+
+\subsection{LIME (Local Interpretable Model-agnostic Explanations)}
+LIME, proposed by Ribeiro et al. \cite{lime}, 
+approximates the decision boundary of 
+DeepMatcher locally using a linear surrogate model. 
+By perturbing the tokens within a record pair, 
+LIME identifies which specific string segments 
+drive a "Match" prediction. We aim to determine 
+if LIME's speed advantage over SHAP compensates 
+for potential losses in global consistency.
+
+\subsection{Adversarial Counterfactual Explanations}
+Following the counterfactual framework defined by Wachter 
+et al. \cite{wachter2017}, we implement a \textbf{Span-based 
+Adversarial Perturbation} strategy. Rather than assigning 
+importance weights, this method seeks the \textit{minimal 
+textual change} required to flip the model's decision.
+
+
+
+We utilize the \textit{TextAttack} framework \cite{textattack2020} 
+with the \textit{TextFooler} algorithm \cite{textfooler2020} to 
+generate these explanations. A key methodological constraint 
+is the use of a \textbf{mutable span}: we fix one record and 
+perturb only the other. This enforces:
+\begin{itemize}
+    \item \textbf{Locality:} Focused changes rather than 
+    distributed noise.
+    \item \textbf{Actionability:} Clear "what-if" scenarios 
+    for data stewards to correct specific record entries.
+\end{itemize}
+
+\subsection{Comparative Objectives}
+We compare these three methods specifically on their ability to 
+handle the "short-text" nature of master data. Our evaluation 
+metrics focus on:
+\begin{enumerate}
+    \item \textbf{Fidelity:} Does the explanation accurately 
+    locate the model's sensitivity?
+    \item \textbf{Speed:} Can the method scale to thousands of 
+    record comparisons per second?
+    \item \textbf{Interpretability:} Does the output (weight vs. 
+    flipped text) provide better diagnostic value for a human user?
+\end{enumerate}
