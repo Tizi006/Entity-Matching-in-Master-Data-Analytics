@@ -133,7 +133,7 @@ def attribute_text(text, target_label=1, baseline_type="pad"):
         baselines=baseline,
         target=target_label,
         additional_forward_args=(attention_mask, token_type_ids),
-        n_steps=10,  # 50-200 ist sehr teuer für cpu
+        n_steps=100,  # 50-200 ist sehr teuer für cpu
         return_convergence_delta=True
     )
 
