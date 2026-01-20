@@ -261,7 +261,7 @@ for i in range(min(10, len(test_data))):
     print(f"\n=== Beispiel {i + 1} | True: {label} | Pred: {pred} ===")
     print(f"Convergence Delta: {abs(delta_val):.6f} (niedriger ist besser)")
 
-    print_token_attributions(tokens, scores)
+    # print_token_attributions(tokens, scores)
 
     attr_scores = aggregate_for_data(tokens, scores, LEFT_COLS, RIGHT_COLS)
     print_attribute_summary(attr_scores)
