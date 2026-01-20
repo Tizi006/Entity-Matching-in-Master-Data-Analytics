@@ -55,7 +55,7 @@ In practice, the path integral is approximated using a finite Riemann sum over $
 
 Captum implements this approximation efficiently and allows practitioners to control the number of integration steps, balancing computational cost and attribution stability.
 
-In the experiments for this paper, we used \(m = 200\) steps.
+In the experiments for this paper, we used \(m = 100\) steps.
 
 \subsection{Baseline Evaluation for Integrated Gradients in Entity Matching}
 
@@ -78,14 +78,69 @@ Structural tokens such as \texttt{[CLS]} and \texttt{[SEP]} are required by Tran
 
 \subsubsection{Results and Discussion}
 
+\begin{table}[h]
+\centering
+\caption{Baseline comparison for Integrated Gradients on 20 example entity pairs. Lower values for average convergence delta, standard deviation, and structural bias indicate more faithful and stable explanations.}
+\label{tab:baseline_comparison}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Baseline} & \textbf{Avg. Delta} & \textbf{Std. Dev.} & \textbf{Struct. Bias (\%)} \\
+\midrule
+ZERO  & 1.912370 & 1.2793 & 19.27 \\
+PAD   & 0.767651 & 0.8092 & 7.77  \\
+MASK  & \textbf{0.502600} & \textbf{0.4197} & \textbf{7.33} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 Across all three metrics, the \texttt{[PAD]} and \texttt{[MASK]} baselines consistently outperform the zero baseline. Both token-based baselines exhibit significantly lower convergence deltas, indicating improved numerical faithfulness with respect to the Completeness Axiom. Furthermore, they yield lower attribution variance, suggesting more stable explanations.
 
 The zero baseline performs worst across all metrics, supporting the hypothesis that a null embedding does not represent true informational absence and may instead introduce out-of-distribution noise. This aligns with prior findings that inappropriate baselines can lead to unreliable saliency maps in gradient-based explanation methods \cite{kindermans2019reliability}.
 
-Between the token-based baselines, \texttt{[MASK]} performs slightly better than \texttt{[PAD]}. In particular, it achieves the lowest average convergence delta and the lowest structural bias, assigning a smaller proportion of attribution mass to \texttt{[CLS]} and \texttt{[SEP]}. A plausible explanation is that \texttt{[MASK]} embeddings are explicitly used during pretraining to represent missing information, making them a more semantically faithful approximation of informational absence than padding tokens, which primarily serve alignment purposes.
+Between the token-based baselines, \texttt{[MASK]} and \texttt{[PAD]} show largely similar behavior, with \texttt{[MASK]} exhibiting a consistent but modest advantage. As shown in Table~\ref{tab:baseline_comparison}, both baselines achieve substantially lower average convergence deltas and standard deviations than the zero baseline, indicating more faithful and stable attributions. At the same time, \texttt{[MASK]} attains slightly lower values for both metrics (average convergence delta of $0.50$ compared to $0.77$, and average standard deviation of $0.42$ compared to $0.81$), suggesting marginally improved numerical convergence and attribution stability.
+
+Both \texttt{[MASK]} and \texttt{[PAD]} also result in comparably low structural bias, assigning approximately $7\%$--$8\%$ of attribution mass to structural tokens such as \texttt{[CLS]} and \texttt{[SEP]}. Overall, the results indicate that while both token-based baselines are well-suited for Integrated Gradients in entity matching, \texttt{[MASK]} provides a small but consistent improvement across the evaluated metrics.
+
 
 \subsubsection{Implications for Explainable Entity Matching}
 
 These results provide empirical evidence that baseline selection substantially affects the quality of Integrated Gradients explanations in entity matching tasks. Token-based baselines that are part of the model’s training distribution yield more faithful, stable, and semantically grounded attributions than a zero vector baseline. The superior performance of the \texttt{[MASK]} baseline suggests that baselines designed to model missing information during pretraining are particularly well-suited for attribution methods in Transformer-based NLP models.
 
-Consequently, we adopt \texttt{[MASK]} as the default baseline for all subsequent explanation analyses in this work.
+Consequently, we adopt \texttt{[MASK]} as the default baseline for all subsequent explanation analyses for IG in this work.
+
+\subsection{Using Integrated Gradients for Decision Explanation}
+
+Integrated Gradients provides fine-grained attribution scores for each input token, allowing a detailed inspection of the model’s decision process. In the context of entity matching, each token receives a signed attribution value, where positive scores indicate evidence in favor of a match and negative scores indicate evidence against a match. The magnitude of the attribution reflects the strength of the token’s contribution to the final prediction.
+
+The input to the model consists of paired attribute columns for two entities, specifically \texttt{authors\_1}, \texttt{authors\_2}, \texttt{title\_1}, \texttt{title\_2}, \texttt{venue\_1}, \texttt{venue\_2}, \texttt{year\_1}, and \texttt{year\_2}. For transparency, the example shown in Figure~\ref{fig:ig_example} corresponds to the following entity pair:
+
+\begin{quote}
+\small
+\texttt{authors\_1}: ``zhao-hui tang, jean-robert gruser, georges gardarin'' \\
+\texttt{authors\_2}: ``elisa bertino'' \\
+\texttt{title\_1}: ``a cost model for clustered object-oriented databases'' \\
+\texttt{title\_2}: ``index configuration in object-oriented databases'' \\
+\texttt{venue\_1}: ``vldb'' \\
+\texttt{venue\_2}: ``the vldb journal -- the international journal on very large data bases'' \\
+\texttt{year\_1}: ``1995'' \\
+\texttt{year\_2}: ``1994''
+\end{quote}
+
+While token-level attributions offer high resolution, they are often difficult to interpret directly for structured inputs with multiple attribute columns. To improve interpretability, we aggregate token attributions at the column level by summing the attributions of all tokens belonging to the same attribute. This aggregation yields a per-column relevance score, enabling a clearer comparison of how different attributes contribute to the overall matching decision.
+
+In the visualization, a dedicated separator token (referred to as \emph{Trenner}) is used to explicitly distinguish the two entities. This delimiter originates from the original data representation and serves solely as a structural boundary between entity attributes. It does not correspond to a semantic feature of either entity and is not intended to contribute meaningful evidence toward the matching decision.
+
+Figure~\ref{fig:igplot} illustrates an example explanation produced using Integrated Gradients for this entity pair. The visualization shows the aggregated relevance scores per attribute column, providing an intuitive summary of the model’s reasoning.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\linewidth]{../image/IGplot.png}
+    \caption{Integrated Gradients explanation for an entity matching decision on a bibliographic record pair. Token-level attributions are aggregated per attribute column (e.g., authors, title, venue, year) to improve interpretability.}
+    \label{fig:igplot}
+\end{figure}
+
+\subsubsection{Observed Explanation Patterns and Anomalies}
+
+During qualitative analysis, we observe that explanations for entity matching decisions sometimes become fully interpretable only when considering the aggregated contributions of both entities jointly. In the illustrated example, one side of the entity pair may initially receive mixed or weak attributions (e.g., differing author names), while the corresponding attributes of the other entity provide strong and directionally consistent evidence that ultimately guides the model’s prediction.
+
+This pattern indicates that the model often relies on comparative interactions between paired attributes---such as semantic overlap in titles or venue similarity---rather than isolated evidence within a single column. Consequently, explanations restricted to one entity in isolation may appear incomplete, whereas aggregating and jointly analyzing attributions across both columns yields a more faithful representation of the model’s matching logic.
