@@ -76,28 +76,6 @@ def forward_embeds_wrapper(embeddings, attention_mask, token_type_ids=None):
 ig = IntegratedGradients(forward_embeds_wrapper)
 
 
-def evaluate_average_delta(test_data, baseline_type="pad"):
-    print(f"\nBerechne Average Convergence Delta für Baseline: {baseline_type}...")
-    all_deltas = []
-
-    # Wir nehmen alle Daten oder ein größeres Sample für die Statistik
-    num_to_eval = len(test_data)
-
-    for i in range(num_to_eval):
-        text = test_data[i]["text"]
-        # Wir brauchen nur das Delta, die restlichen Rückgabewerte ignorieren wir hier
-        _, _, _, delta_val, _ = attribute_text(text, target_label=1, baseline_type=baseline_type)
-        all_deltas.append(abs(delta_val))
-
-        if (i + 1) % 10 == 0:
-            print(f"Fortschritt: {i + 1}/{num_to_eval}")
-
-    avg_delta = np.mean(all_deltas)
-    std_delta = np.std(all_deltas)
-
-    return avg_delta, std_delta
-
-
 def attribute_text(text, target_label=1, baseline_type="pad"):
     enc = tokenizer(text, return_tensors="pt", truncation=True, padding=True).to(DEVICE)
     input_ids = enc["input_ids"]
