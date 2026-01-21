@@ -6,6 +6,7 @@ explanation} is then a procedure $\lambda(f,x)$ that links parts of the input $x
 values (attributions) and communicates them in a way that is interpretable for humans.
 
 \subsubsection{LIME\cite{lime} as a baseline: Local surrogate models through perturbations}
+
 LEMON is fundamentally based on LIME. The key idea of LIME is to approximate local decision rules
 in order to explain a specific instance using an easily interpretable surrogate model. To do so,
 the instance is first broken down into tokens, on which random perturbations are generated. The
@@ -20,7 +21,7 @@ LEMON addresses three weaknesses of LIME:
 
 \paragraph{Cross-record interaction effects.}
 Linear regression implicitly assumes feature independence, which is often violated due to strong
-interactions between fields. LEMON therefore treats both data points individually, yielding
+interactions between features. LEMON therefore treats both data points individually, yielding
 \emph{dual explanations}: while one record is perturbed, the other remains constant.
 
 \paragraph{Non-match explanations.}
@@ -36,7 +37,7 @@ highest overall prediction score is selected.
 
 \paragraph{Variation in sensitivity.}
 Depending on the pair and dataset, noticeable score changes may require perturbing many coarse
-parts, whereas explanations should ideally rely on few features. LEMON therefore selects the
+parts, whereas explanations should ideally rely on small features. LEMON therefore selects the
 feature granularity adaptively using its own metric: the number of tokens combined into a feature
 is doubled iteratively until a maximum is reached or the metric permits selection.
 
@@ -65,15 +66,6 @@ fixed at the attribute level. An additional training pair was evaluated using an
 size and adaptive granularity.
 
 \subsubsection{Results}
-If the input is formatted incorrectly such that contents of data points 1 and 2 are mixed, the
-model consistently returns a negative prediction because it effectively no longer processes a
-consistent comparison pair. Such a pipeline error is easily identified with LEMON: if weights and
-potentials remain close to $0$ across all attributes, perturbations of the model input have
-virtually no influence on the output. This indicates that the decision is not data-driven but
-dominated by a structural input error.
-
-Negative values shift the decision towards \emph{non-match}, whereas positive values support
-\emph{match}.
 
 \paragraph{Model behaviour and score characteristics.}
 Model outputs are highly saturated and form two clusters: non-match scores of approximately
@@ -82,6 +74,8 @@ suggests that in the saturated regime, small input changes only slightly affect 
 Accordingly, removal-based attributions can be insensitive in some cases. Here, \emph{attribution
 potential} provides clear additional value as a counterfactual signal, because it is more
 sensitive.
+Negative values shift the decision towards \emph{non-match}, whereas positive values support
+\emph{match}.
 
 Across match cases, \texttt{authors} and \texttt{title} consistently dominate as the strongest
 positive contributors, while \texttt{year} sometimes contributes significantly but is less stable.
@@ -89,6 +83,46 @@ The decisiveness of \texttt{authors} and \texttt{title} is also visible in non-m
 high attribution potential. In contrast, \texttt{venue} typically contributes little and can even
 be slightly negative. Overall, this corresponds to a matcher where author/title proximity are the
 main anchors, year acts as a case-dependent constraint, and venue is secondary or prone to noise.
+
+During the initial tests, errors occurred during preprocessing, which led to the following observations:
+If the input is formatted incorrectly such that contents of data points 1 and 2 are mixed, the
+model consistently returns a negative prediction because it effectively no longer processes a
+consistent comparison pair. Such a pipeline error is easily identified with LEMON: if weights and
+potentials remain close to $0$ across all attributes, perturbations of the model input have
+virtually no influence on the output. This indicates that the decision is not data-driven but
+dominated by a structural input error.
+
+\paragraph{Outcome of explanation with adaptive granularity:}
+\begin{itemize}
+  \item \textbf{Feature \#1}: \texttt{a.authors\_1.val[4]} $\rightarrow$ \enquote{v. jagadish},
+  weight = $+0.012383$, potential = $0.3589919154809498$.
+
+  \item \textbf{Feature \#2}: \texttt{a.authors\_1.val[6]} $\rightarrow$ \enquote{kapitskaia},
+  weight = $-0.030726$, potential = $-0.052823583150882654$.
+
+  \item \textbf{Feature \#3}: \texttt{a.authors\_1.val[5]} $\rightarrow$ \enquote{, olga},
+  weight = $-0.011131$, potential = $0.08261391170810445$.
+
+  \item \textbf{Feature \#4}: \texttt{a.venue\_1.val[2]} $\rightarrow$ \enquote{firm real-time},
+  weight = $-0.030130$, potential = $-0.01083177277319058$.
+
+  \item \textbf{Feature \#5}: \texttt{b.title\_2.val} $\rightarrow$ \enquote{hierarchical subspace sampling : a unified framework for high dimensional data reduction , selectivity estimation and nearest neighbor search},
+  weight = $+0.019778$, potential = $0.3772542258358663$.
+
+  \item \textbf{Feature \#6}: \texttt{b.year\_2.val} $\rightarrow$ \enquote{2002},
+  weight = $-0.051594$, potential = $0.006021464020844458$.
+
+  \item \textbf{Feature \#7}: \texttt{b.authors\_2.val} $\rightarrow$ \enquote{charu c. aggarwal},
+  weight = $+0.038282$, potential = $0.00033177718596906546$.
+
+  \item \textbf{Feature \#8}: \texttt{b.venue\_2.val} $\rightarrow$ \enquote{international conference on management of data},
+  weight = $-0.027601$, potential = $0.06593901646604888$.
+\end{itemize}
+
+This more granular explanation once again shows how central the \texttt{authors} field is to the model, as three of the four highest-ranked features originate from \texttt{authors}. Furthermore, the ranking suggests that usually only one feature is highly dominant. This may be partly explained by the small number of perturbation samples, where correlated features can lose apparent significance in the local surrogate model. In addition, many tokens may have limited influence when the underlying matcher produces strongly saturated predictions close to match or non-match.
+
+
+
 
 \paragraph{Interpretability and limitations.}
 LEMON yields useful but partially limited explanations of the model decisions. A key strength is
