@@ -2,13 +2,23 @@
 
 \subsection{Captum: A Framework for Model Interpretability}
 
-Captum is an open-source interpretability library developed by Facebook AI Research for PyTorch-based models~\cite{kokhlikyan2020captum}. It provides a unified interface for a wide range of feature attribution and explanation methods. Captum is designed to be model-agnostic within the PyTorch ecosystem and supports both computer vision and natural language processing (NLP) tasks.
+Captum is an open-source interpretability library developed by Facebook AI Research for 
+PyTorch-based models~\cite{kokhlikyan2020captum}. It provides a unified interface for a 
+wide range of feature attribution and explanation methods. Captum is designed to be model-agnostic 
+within the PyTorch ecosystem and supports both computer vision and natural language processing (NLP) tasks.
 
-A key advantage of Captum is its native support for \emph{Integrated Gradients (IG)}, a theoretically grounded attribution method that satisfies desirable axiomatic properties such as sensitivity and completeness~\cite{sundararajan2017axiomatic}. For NLP applications, Captum allows IG to be computed directly in the \emph{embedding space}, which is crucial for models that operate on dense vector representations rather than discrete tokens. This makes Captum particularly suitable for explainability in entity matching systems based on deep neural architectures such as Transformers or Siamese networks.
+A key advantage of Captum is its native support for \emph{Integrated Gradients (IG)}, 
+a theoretically grounded attribution method that satisfies desirable axiomatic properties such as 
+sensitivity and completeness~\cite{sundararajan2017axiomatic}. For NLP applications, Captum allows 
+IG to be computed directly in the \emph{embedding space}, which is crucial for models that 
+operate on dense vector representations rather than discrete tokens. This makes Captum particularly 
+suitable for explainability in entity matching systems based on deep neural architectures such as Transformers or Siamese networks.
 
 \subsection{Integrated Gradients: Definition and Intuition}
 
-Integrated Gradients attributes the prediction of a model to its input features by integrating the gradients of the model’s output with respect to the input along a straight-line path from a \emph{baseline} $x'$ to the actual input $x$. Formally, for a model $F$ and input feature $x_i$, the Integrated Gradient is defined as:
+Integrated Gradients attributes the prediction of a model to its input features by integrating the gradients of the model’s 
+output with respect to the input along a straight-line path from a \emph{baseline} $x'$ to the actual input $x$. Formally, 
+for a model $F$ and input feature $x_i$, the Integrated Gradient is defined as:
 
 \begin{equation}
 \mathrm{IG}_i(x) = (x_i - x'_i) \cdot \int_{\alpha=0}^{1} 
@@ -23,27 +33,42 @@ where:
     \item $\frac{\partial F}{\partial x_i}$ is the gradient of the model output with respect to the $i$-th input feature.
 \end{itemize}
 
-The resulting attribution score quantifies how much each feature contributes to the change in the model’s prediction from the baseline to the input.
-
-\pagebreak
+The resulting attribution score quantifies how much each feature contributes to the change in the model’s 
+prediction from the baseline to the input.
 
 \subsection{The Role of the Baseline $x'$}
 
-Integrated Gradients explains \emph{the difference in prediction between the baseline and the input}, rather than the absolute prediction itself. Consequently, the choice of baseline is critical and directly affects the semantic validity of the explanation.
+Integrated Gradients explains \emph{the difference in prediction between the baseline and the input}, 
+rather than the absolute prediction itself. Consequently, the choice of baseline is critical and directly affects the semantic validity of the explanation.
 
 \paragraph{Relative Zero Point}
 
-The baseline represents a \emph{relative zero point} for attribution. It must not convey meaningful information or semantic context. A naive choice such as a zero vector (null matrix) can be problematic, especially in NLP. If such values were never observed during training, the model may interpret them as out-of-distribution noise rather than the absence of information, leading to distorted attributions~\cite{kindermans2019reliability}.
+The baseline represents a \emph{relative zero point} for attribution. It must not convey meaningful information or 
+semantic context. A naive choice such as a zero vector (null matrix) can be problematic, especially in NLP. 
+If such values were never observed during training, the model may interpret them as out-of-distribution noise 
+rather than the absence of information, leading to distorted attributions~\cite{kindermans2019reliability}.
 
 \paragraph{Information vs. Absence of Information}
 
-An effective baseline should encode \emph{informational absence}, not alternative information. In NLP models, embeddings are learned representations with structured geometry; therefore, a zero embedding does not necessarily correspond to ``no token.'' Instead, padding tokens such as \texttt{[PAD]}, which are explicitly introduced during training and masked appropriately, more reliably represent the absence of semantic content~\cite{wallace2019trick}.
+An effective baseline should encode \emph{informational absence}, not alternative information. 
+In NLP models, embeddings are learned representations with structured geometry; therefore, 
+a zero embedding does not necessarily correspond to ``no token.'' Instead, padding tokens such as 
+\texttt{[PAD]}, which are explicitly introduced during training and masked appropriately, 
+more reliably represent the absence of semantic content~\cite{wallace2019trick}.
+
+\pagebreak
 
 \subsection{Saturation and the Need for Integration}
 
-A central motivation for Integrated Gradients is the \emph{saturation problem} of standard gradient-based explanations. When a model is highly confident in its prediction (e.g., output probability close to $0.99$), the gradient at the input $x$ may be near zero due to local flatness of the decision function. Relying solely on this gradient would incorrectly suggest that the input features are unimportant.
+A central motivation for Integrated Gradients is the \emph{saturation problem} 
+of standard gradient-based explanations. When a model is highly confident in its prediction 
+(e.g., output probability close to $0.99$), the gradient at the input $x$ may be near zero due to 
+local flatness of the decision function. Relying solely on this gradient would incorrectly suggest 
+that the input features are unimportant.
 
-Integrated Gradients mitigates this issue by accumulating gradients \emph{along the entire path} from the baseline (where the prediction may be low, e.g., $0.1$) to the final input. This captures how the model’s confidence evolves throughout the input space, providing a faithful attribution even in saturated regions of the function~\cite{sundararajan2017axiomatic}.
+Integrated Gradients mitigates this issue by accumulating gradients \emph{along the entire path} 
+from the baseline (where the prediction may be low, e.g., $0.1$) to the final input. This captures how the model’s 
+confidence evolves throughout the input space, providing a faithful attribution even in saturated regions of the function~\cite{sundararajan2017axiomatic}.
 
 \subsection{Practical Implementation in Captum}
 
@@ -55,34 +80,57 @@ In practice, the path integral is approximated using a finite Riemann sum over $
 \frac{\partial F\big(x' + \frac{k}{m}(x - x')\big)}{\partial x_i}
 \end{equation}
 
-Captum implements this approximation efficiently and allows practitioners to control the number of integration steps, balancing computational cost and attribution stability.
+Captum implements this approximation efficiently and allows practitioners to 
+control the number of integration steps, balancing computational cost and attribution stability.
 
 In the experiments for this paper, we used \(m = 100\) steps.
 
 \subsection{Baseline Evaluation for Integrated Gradients in Entity Matching}
 
-The choice of baseline is a critical design decision for Integrated Gradients, particularly in NLP tasks where inputs are embedded in a high-dimensional semantic space. To empirically assess the impact of different baselines on explanation quality, we compare three commonly used baselines: a zero vector baseline (\texttt{ZERO}), a padding token baseline (\texttt{[PAD]}), and a masking token baseline (\texttt{[MASK]}). For the latter two, token identifiers are obtained using the AutoTokenizer from the pretrained BERT-Model, specifically \texttt{tokenizer.pad\_token\_id} and \texttt{tokenizer.mask\_token\_id}.
+The choice of baseline is a critical design decision for Integrated Gradients, 
+particularly in NLP tasks where inputs are embedded in a high-dimensional semantic space. 
+To empirically assess the impact of different baselines on explanation quality, 
+we compare three commonly used baselines: a zero vector baseline (\texttt{ZERO}), 
+a padding token baseline (\texttt{[PAD]}), and a masking token baseline (\texttt{[MASK]}). 
+For the latter two, token identifiers are obtained using the AutoTokenizer from the pretrained BERT-Model, 
+specifically \texttt{tokenizer.pad\_token\_id} and \texttt{tokenizer.mask\_token\_id}.
 
-All baselines are evaluated in the embedding space, ensuring compatibility with the model’s learned representation geometry. The goal of this evaluation is not to optimize predictive performance, but to analyze the \emph{stability}, \emph{faithfulness}, and \emph{structural bias} of the resulting attributions.
+All baselines are evaluated in the embedding space, ensuring compatibility with the model’s 
+learned representation geometry. The goal of this evaluation is not to optimize predictive performance, 
+but to analyze the \emph{stability}, \emph{faithfulness}, and \emph{structural bias} of the resulting attributions.
+
+\pagebreak
 
 \subsubsection{Evaluation Metrics}
 
 We assess baseline quality using three complementary metrics:
 
 \paragraph{Average Convergence Delta}
-Integrated Gradients theoretically satisfies the Completeness Axiom, which implies that the sum of all feature attributions should equal $F(x) - F(x')$. In practice, numerical approximation introduces a convergence error. Captum reports this error as the \emph{convergence delta}. We compute the average convergence delta across the evaluation set to measure how well each baseline supports faithful numerical integration. Lower values indicate better adherence to the completeness property and more reliable attributions.
+Integrated Gradients theoretically satisfies the Completeness Axiom, which implies that the sum of 
+all feature attributions should equal $F(x) - F(x')$. In practice, numerical approximation introduces a convergence error. 
+Captum reports this error as the \emph{convergence delta}. We compute the average convergence delta across the evaluation 
+set to measure how well each baseline supports faithful numerical integration. Lower values indicate better adherence to the completeness property and more reliable attributions.
 
 \paragraph{Average Standard Deviation}
-To quantify explanation stability, we compute the average standard deviation of attribution scores across multiple inputs. High variance suggests sensitivity to minor input changes or numerical artifacts, whereas low variance indicates stable and robust explanations. This metric captures the extent to which a baseline produces consistent attributions across different entity pairs.
+To quantify explanation stability, we compute the average standard deviation of attribution scores across 
+multiple inputs. High variance suggests sensitivity to minor input changes or numerical artifacts, 
+whereas low variance indicates stable and robust explanations. This metric captures the extent to which a 
+baseline produces consistent attributions across different entity pairs.
 
 \paragraph{Structural Bias}
-Structural tokens such as \texttt{[CLS]} and \texttt{[SEP]} are required by Transformer architectures but typically do not carry semantic information relevant to entity matching decisions. We therefore measure \emph{structural bias} as the percentage of total attribution mass assigned to these tokens. Lower structural bias indicates that the explanation focuses on semantically meaningful tokens rather than architectural artifacts.
+Structural tokens such as \texttt{[CLS]} and \texttt{[SEP]} are required by Transformer architectures but typically 
+do not carry semantic information relevant to entity matching decisions. We therefore measure \emph{structural bias} 
+as the percentage of total attribution mass assigned to these tokens. Lower structural bias indicates that the explanation 
+focuses on semantically meaningful tokens rather than architectural artifacts.
+
+\pagebreak
 
 \subsubsection{Results and Discussion}
 
 \begin{table}[H]
 \centering
-\caption{Baseline comparison for Integrated Gradients on 20 example entity pairs. Lower values for average convergence delta, standard deviation, and structural bias indicate more faithful and stable explanations.}
+\caption{Baseline comparison for Integrated Gradients on 20 example entity pairs. 
+Lower values for average convergence delta, standard deviation, and structural bias indicate more faithful and stable explanations.}
 \label{tab:baseline_comparison}
 \begin{tabular}{lccc}
 \toprule
@@ -95,18 +143,33 @@ MASK  & \textbf{0.502600} & \textbf{0.4197} & \textbf{7.33} \\
 \end{tabular}
 \end{table}
 
-Across all three metrics, the \texttt{[PAD]} and \texttt{[MASK]} baselines consistently outperform the zero baseline. Both token-based baselines exhibit significantly lower convergence deltas, indicating improved numerical faithfulness with respect to the Completeness Axiom. Furthermore, they yield lower attribution variance, suggesting more stable explanations.
+Across all three metrics, the \texttt{[PAD]} and \texttt{[MASK]} baselines consistently outperform the zero baseline. 
+Both token-based baselines exhibit significantly lower convergence deltas, 
+indicating improved numerical faithfulness with respect to the Completeness Axiom. 
+Furthermore, they yield lower attribution variance, suggesting more stable explanations.
 
-The zero baseline performs worst across all metrics, supporting the hypothesis that a null embedding does not represent true informational absence and may instead introduce out-of-distribution noise~\cite{kindermans2019reliability}. This aligns with prior findings that inappropriate baselines can lead to unreliable saliency maps in gradient-based explanation methods.
+The zero baseline performs worst across all metrics, supporting the hypothesis that a null embedding 
+does not represent true informational absence and may instead introduce out-of-distribution noise~\cite{kindermans2019reliability}. 
+This aligns with prior findings that inappropriate baselines can lead to unreliable saliency maps in gradient-based explanation methods.
 
-Between the token-based baselines, \texttt{[MASK]} and \texttt{[PAD]} show largely similar behavior, with \texttt{[MASK]} exhibiting a consistent but modest advantage. As shown in Table~\ref{tab:baseline_comparison}, both baselines achieve substantially lower average convergence deltas and standard deviations than the zero baseline, indicating more faithful and stable attributions. At the same time, \texttt{[MASK]} attains slightly lower values for both metrics (average convergence delta of $0.50$ compared to $0.77$, and average standard deviation of $0.42$ compared to $0.81$), suggesting marginally improved numerical convergence and attribution stability.
+Between the token-based baselines, \texttt{[MASK]} and \texttt{[PAD]} show largely similar behavior, with \texttt{[MASK]} 
+exhibiting a consistent but modest advantage. As shown in Table~\ref{tab:baseline_comparison}, both baselines achieve substantially 
+lower average convergence deltas and standard deviations than the zero baseline, indicating more faithful and stable attributions. 
+At the same time, \texttt{[MASK]} attains slightly lower values for both metrics (average convergence delta of $0.50$ compared to $0.77$, 
+and average standard deviation of $0.42$ compared to $0.81$), suggesting marginally improved numerical convergence and attribution stability.
 
-Both \texttt{[MASK]} and \texttt{[PAD]} also result in comparably low structural bias, assigning approximately $7\%$--$8\%$ of attribution mass to structural tokens such as \texttt{[CLS]} and \texttt{[SEP]}. Overall, the results indicate that while both token-based baselines are well-suited for Integrated Gradients in entity matching, \texttt{[MASK]} provides a small but consistent improvement across the evaluated metrics.
+Both \texttt{[MASK]} and \texttt{[PAD]} also result in comparably low structural bias, 
+assigning approximately $7\%$--$8\%$ of attribution mass to structural tokens such as \texttt{[CLS]} and \texttt{[SEP]}. 
+Overall, the results indicate that while both token-based baselines are well-suited for Integrated Gradients in entity matching, 
+\texttt{[MASK]} provides a small but consistent improvement across the evaluated metrics.
 
 
 \subsubsection{Implications for Explainable Entity Matching}
 
-These results provide empirical evidence that baseline selection substantially affects the quality of Integrated Gradients explanations in entity matching tasks. Token-based baselines that are part of the model’s training distribution yield more faithful, stable, and semantically grounded attributions than a zero vector baseline. The superior performance of the \texttt{[MASK]} baseline suggests that baselines designed to model missing information during pretraining are particularly well-suited for attribution methods in Transformer-based NLP models.
+These results provide empirical evidence that baseline selection substantially affects the quality of Integrated Gradients 
+explanations in entity matching tasks. Token-based baselines that are part of the model’s training distribution yield more faithful, 
+stable, and semantically grounded attributions than a zero vector baseline. The superior performance of the \texttt{[MASK]} baseline 
+suggests that baselines designed to model missing information during pretraining are particularly well-suited for attribution methods in Transformer-based NLP models.
 
 Consequently, we adopt \texttt{[MASK]} as the default baseline for all subsequent explanation analyses for IG in this work.
 
@@ -114,9 +177,13 @@ Consequently, we adopt \texttt{[MASK]} as the default baseline for all subsequen
 
 \subsection{Using Integrated Gradients for Decision Explanation}
 
-Integrated Gradients provides fine-grained attribution scores for each input token, allowing a detailed inspection of the model’s decision process. In the context of entity matching, each token receives a signed attribution value, where positive scores indicate evidence in favor of a match and negative scores indicate evidence against a match. The magnitude of the attribution reflects the strength of the token’s contribution to the final prediction.
+Integrated Gradients provides fine-grained attribution scores for each input token, allowing a detailed inspection of the model’s decision process. 
+In the context of entity matching, each token receives a signed attribution value, where positive scores indicate evidence in favor of a 
+match and negative scores indicate evidence against a match. The magnitude of the attribution reflects the strength of the token’s contribution to the final prediction.
 
-The input to the model consists of paired attribute columns for two entities, specifically \texttt{authors\_1}, \texttt{authors\_2}, \texttt{title\_1}, \texttt{title\_2}, \texttt{venue\_1}, \texttt{venue\_2}, \texttt{year\_1}, and \texttt{year\_2}. For transparency, the example shown in Figure~\ref{fig:igplot} corresponds to the following entity pair:
+The input to the model consists of paired attribute columns for two entities, specifically \texttt{authors\_1}, 
+\texttt{authors\_2}, \texttt{title\_1}, \texttt{title\_2}, \texttt{venue\_1}, \texttt{venue\_2}, \texttt{year\_1}, and 
+\texttt{year\_2}. For transparency, the example shown in Figure~\ref{fig:igplot} corresponds to the following entity pair:
 
 \begin{quote}
 \small
@@ -130,21 +197,33 @@ The input to the model consists of paired attribute columns for two entities, sp
 \texttt{year\_2}: ``1994''
 \end{quote}
 
-While token-level attributions offer high resolution, they are often difficult to interpret directly for structured inputs with multiple attribute columns. To improve interpretability, we aggregate token attributions at the column level by summing the attributions of all tokens belonging to the same attribute. This aggregation yields a per-column relevance score, enabling a clearer comparison of how different attributes contribute to the overall matching decision.
+While token-level attributions offer high resolution, they are often difficult to interpret directly for structured inputs with 
+multiple attribute columns. To improve interpretability, we aggregate token attributions at the column level by summing the 
+attributions of all tokens belonging to the same attribute. This aggregation yields a per-column relevance score, enabling 
+a clearer comparison of how different attributes contribute to the overall matching decision.
 
-In the visualization, a dedicated separator token (referred to as \emph{Trenner}) is used to explicitly distinguish the two entities. This delimiter originates from the original data representation and serves solely as a structural boundary between entity attributes. It does not correspond to a semantic feature of either entity and is not intended to contribute meaningful evidence toward the matching decision.
+In the visualization, a dedicated separator token (referred to as \emph{Trenner}) is used to explicitly distinguish the two entities. 
+This delimiter originates from the original data representation and serves solely as a structural boundary between entity attributes. 
+It does not correspond to a semantic feature of either entity and is not intended to contribute meaningful evidence toward the matching decision.
 
-Figure~\ref{fig:igplot} illustrates an example explanation produced using Integrated Gradients for this entity pair. The visualization shows the aggregated relevance scores per attribute column, providing an intuitive summary of the model’s reasoning.
+Figure~\ref{fig:igplot} illustrates an example explanation produced using Integrated Gradients for this entity pair. 
+The visualization shows the aggregated relevance scores per attribute column, providing an intuitive summary of the model’s reasoning.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{images/IGplot.png}
-    \caption{Integrated Gradients explanation for an entity matching decision on a bibliographic record pair. Token-level attributions are aggregated per attribute column (e.g., authors, title, venue, year) to improve interpretability.}
+    \caption{Integrated Gradients explanation for an entity matching decision on a bibliographic record pair. 
+    Token-level attributions are aggregated per attribute column (e.g., authors, title, venue, year) to improve interpretability.}
     \label{fig:igplot}
 \end{figure}
 
 \subsubsection{Observed Explanation Patterns and Anomalies}
 
-During qualitative analysis, we observe that explanations for entity matching decisions sometimes become fully interpretable only when considering the aggregated contributions of both entities jointly. In the illustrated example, one side of the entity pair may initially receive mixed or weak attributions (e.g., differing author names), while the corresponding attributes of the other entity provide strong and directionally consistent evidence that ultimately guides the model’s prediction.
+During qualitative analysis, we observe that explanations for entity matching decisions sometimes become fully interpretable 
+only when considering the aggregated contributions of both entities jointly. In the illustrated example, one side of the entity pair 
+may initially receive mixed or weak attributions (e.g., differing author names), while the corresponding attributes of the other entity 
+provide strong and directionally consistent evidence that ultimately guides the model’s prediction.
 
-This pattern indicates that the model often relies on comparative interactions between paired attributes---such as semantic overlap in titles or venue similarity---rather than isolated evidence within a single column. Consequently, explanations restricted to one entity in isolation may appear incomplete, whereas aggregating and jointly analyzing attributions across both columns yields a more faithful representation of the model’s matching logic.
+This pattern indicates that the model often relies on comparative interactions between paired attributes---such as semantic 
+overlap in titles or venue similarity---rather than isolated evidence within a single column. Consequently, explanations restricted to one entity 
+in isolation may appear incomplete, whereas aggregating and jointly analyzing attributions across both columns yields a more faithful representation of the model’s matching logic.
