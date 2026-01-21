@@ -13,7 +13,7 @@ source venv/bin/activate   # Linux / macOS
 ### Option B: conda
 
 ```bash
-conda create -n xai-em python=3.10
+conda create -n xai-em python=3.11
 conda activate xai-em
 ```
 
@@ -28,20 +28,14 @@ Typical dependencies include:
 - pandas
 - numpy
 
-If you want GPU support, make sure to install a PyTorch version,
-that is compatible with your CUDA installation.
-
 Install all required packages using:
 
 ```bash
 pip install -r EMCode/requirements.txt
 ```
 
-or manually install the most important packages via pip:
-
-```bash
-pip install -q transformers captum pandas
-```
+If you want GPU support, make sure to install a PyTorch version,
+that is compatible with your CUDA installation.
 
 ## 3. Trained Model
 
@@ -61,9 +55,13 @@ and shouldn't be used for real explanations.
 
 ## 4 Integrated Gradients (Captum)
 
+Hinweis: Getestet mit Python 3.11 und 3.12 (empfohlen).
+
 Install the requirements from requirements.txt.
 
 ## 5. Counterfactual explainer
+
+Hinweis: Getestet mit Python 3.12 (empfohlen).
 
 If you experience errors when running the counterfactual attack script
 (e.g. TensorFlow GPU errors, libdevice missing, or NLTK lookup failures), follow the steps below.
@@ -124,5 +122,7 @@ XLA_FLAGS=--xla_gpu_cuda_data_dir=/usr/lib/cuda
 - This setup was tested with CUDA installed under /usr/lib/cuda.
 
 ## 6. Lemon
+
+Hinweis: Getestet mit Python 3.11.5 (empfohlen). Bei Python 3.12 können Build\-Fehler beim Installieren von `scikit-learn` auftreten; verwende falls nötig Python 3.11.5.
 
 The explanation can require a lot of RAM, therefore it is suggested to reduce num_samples or set granularity to "attributes" or "tokens".
