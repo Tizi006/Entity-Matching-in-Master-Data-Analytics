@@ -12,7 +12,6 @@ from EMCode.scripts.data_loader import project_root
 
 from lemon import explain
 
-
 import random
 
 
@@ -25,9 +24,6 @@ np.random.seed(SEED)
 torch.manual_seed(SEED)
 if torch.cuda.is_available():
     torch.cuda.manual_seed_all(SEED)
-
-
-
 
 
 
@@ -100,7 +96,7 @@ def load_data_from_file(
     return formatted_data
 
 def infer_left_right_columns_from_df(df: pd.DataFrame):
-    # CSV-Reihenfolge beibehalten
+
     left_cols = [c for c in df.columns if c.endswith("_1")]
     right_cols = [c for c in df.columns if c.endswith("_2")]
     return left_cols, right_cols
@@ -108,7 +104,7 @@ def infer_left_right_columns_from_df(df: pd.DataFrame):
 def format(df):
     LEFT_COLS, RIGHT_COLS = infer_left_right_columns_from_df(df)
 
-    # Für LEMON: zwei Tabellen + stabile IDs
+    # zwei Tabellen +  IDs
     records_a = df[LEFT_COLS].fillna("").astype(str).copy()
     records_b = df[RIGHT_COLS].fillna("").astype(str).copy()
     records_a.index = [f"a{i}" for i in range(len(records_a))]
@@ -241,13 +237,8 @@ dfs = [
 
 
 
-
-
-
-
-
 # -----------------------------
-# 2) Tokenizer + Model laden (WICHTIG: gleich wie im Training!)
+# Tokenizer + Model laden 
 # -----------------------------
 DEVICE = "cuda" if torch.cuda.is_available() else ("mps" if torch.backends.mps.is_available() else "cpu")
 device = torch.device(DEVICE)
@@ -257,13 +248,6 @@ ROOT = project_root()
 MODEL_PATH = os.path.abspath(os.path.join(ROOT, "models/em_bert_model.pt"))
 
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-
-
-
-
-
-
-
 
 
 class EMModel(nn.Module):
@@ -302,14 +286,13 @@ class EMModel(nn.Module):
         return embeddings[:, 0, :]
 
 
-
-
 model = EMModel().to(device)
 
 
-
+# model laden
 state = torch.load(MODEL_PATH, map_location="cpu")
-# robust gegen Wrapper
+
+'''
 if isinstance(state, dict) and "state_dict" in state:
     state = state["state_dict"]
 if isinstance(state, dict) and "model_state_dict" in state:
@@ -317,19 +300,16 @@ if isinstance(state, dict) and "model_state_dict" in state:
 # robust gegen DataParallel "module."
 if isinstance(state, dict) and any(k.startswith("module.") for k in state.keys()):
     state = {k.replace("module.", "", 1): v for k, v in state.items()}
+'''
+
 
 model.load_state_dict(state, strict=True)
 model.eval()
 
 
-
-
-
-
 # -----------------------------
-# 4) predict_proba für LEMON
+# predict_proba für LEMON
 # -----------------------------
-
 
 
 def infer_left_right_columns_from_csv(pd_f):
@@ -346,29 +326,21 @@ def infer_left_right_columns_from_csv(pd_f):
     return left_cols, right_cols
 
 
-
-
 def predict_proba(records_a: pd.DataFrame,
                   records_b: pd.DataFrame,
                   record_id_pairs: pd.DataFrame,
                   **kwargs) -> np.ndarray:
     
-
+# jedes gelieferte pd pair wird wieder in die ursprüngliche Form gebracht
     a_ids = record_id_pairs["a.rid"].tolist()
     b_ids = record_id_pairs["b.rid"].tolist()
 
     a_part = records_a.loc[a_ids].copy()
     b_part = records_b.loc[b_ids].copy()
 
-    # Index auf Pair-Index setzen (damit spätere Joins/Debug konsistent sind)
     a_part.index = record_id_pairs.index
     b_part.index = record_id_pairs.index
 
-
-
-
-
-    # Basenamen in der Reihenfolge der linken Spalten (damit "authors, title, venue, year" stabil bleibt)
     base_names = [c[:-2] for c in a_part.columns if c.endswith("_1")]
 
     # Output in gewünschter Reihenfolge zusammenbauen
@@ -383,11 +355,7 @@ def predict_proba(records_a: pd.DataFrame,
         if col_r in b_part.columns:
             df_pairs[col_r] = b_part[col_r].astype(str)
 
-
-
-
-
-
+# preprocessing + tokenization
 
     LEFT_COLS, RIGHT_COLS = infer_left_right_columns_from_csv(df_pairs)
     test_data = load_data_from_file(
@@ -396,12 +364,9 @@ def predict_proba(records_a: pd.DataFrame,
         text_cols_right=RIGHT_COLS
     )
 
-
-
-
     enc = tokenizer(test_data, return_tensors="pt", truncation=True, padding=True)
     enc = {k: v.to(DEVICE) for k, v in enc.items()}
-
+# Vorhersage berechnen
     with torch.no_grad():
         logits = model(**enc)          # wenn HF-Model; sonst siehe Fall D
         logits = logits.logits if hasattr(logits, "logits") else logits
@@ -410,73 +375,9 @@ def predict_proba(records_a: pd.DataFrame,
     probs = probs.detach().cpu().numpy().astype(float)
     return probs
 
-
-
-
-#
-# 5) Zeitmessung
-#
-
-def run_explain_benchmark(explain_fn, name, *, repeats=5, warmup=1, **explain_kwargs):
-    times = []
-    py_peaks = []
-    gpu_peaks = []
-
-    # Warmup (nicht messen): wichtig wegen CUDA/MPS JIT, Cache, Tokenizer-Graph, etc.
-    for _ in range(warmup):
-        _ = explain_fn(**explain_kwargs)
-
-    for _ in range(repeats):
-        gc.collect()
-        if torch.cuda.is_available():
-            torch.cuda.empty_cache()
-            torch.cuda.reset_peak_memory_stats()
-
-        tracemalloc.start()
-        t0 = time.perf_counter()
-
-        out = explain_fn(**explain_kwargs)
-
-        t1 = time.perf_counter()
-        current, peak = tracemalloc.get_traced_memory()
-        tracemalloc.stop()
-
-        times.append(t1 - t0)
-        py_peaks.append(peak)
-
-        if torch.cuda.is_available():
-            gpu_peaks.append(torch.cuda.max_memory_allocated())
-        else:
-            gpu_peaks.append(None)
-
-    def _summ(x):
-        x2 = [v for v in x if v is not None]
-        return {
-            "n": len(x),
-            "mean": statistics.mean(x) if len(x) else None,
-            "median": statistics.median(x) if len(x) else None,
-            "stdev": statistics.pstdev(x) if len(x) > 1 else 0.0,
-            "min": min(x) if len(x) else None,
-            "max": max(x) if len(x) else None,
-        }
-
-    stats = {
-        "name": name,
-        "time_s": _summ(times),
-        "py_peak_bytes": _summ(py_peaks),
-        "gpu_peak_bytes": _summ(gpu_peaks) if any(v is not None for v in gpu_peaks) else None,
-    }
-    return out, stats
-
-
-
-
-
-
 # -----------------------------
 # 9 verschidene Beispielpaare
 # -----------------------------
-'''
 
 for df in dfs:
     records_a,records_b,record_id_pairs= format(df)
@@ -500,7 +401,6 @@ for df in dfs:
     for a in res.attributions: 
         print( f" weight={a.weight:+.6f} | potential={a.potential} | positions={a.positions} | name={a.name}" )
 
-'''
 # -----------------------------
 # Eine Aufwendigere Erklärng
 # -----------------------------
@@ -513,7 +413,7 @@ res=explain(
     predict_proba=predict_proba,
     num_features=4,
     return_dict=True,
-    num_samples=100,
+    num_samples=200,
     estimate_potential=True,
     granularity="counterfactual",
     show_progress=False,
@@ -527,99 +427,9 @@ for a in res.attributions:
     print( f" weight={a.weight:+.6f} | potential={a.potential} | positions={a.positions} | name={a.name}" )
 
 
-
-
-
-
-
-'''
-records_a,records_b,record_id_pairs= format(df_diff)
-
-
-EXPLAIN_KWARGS = dict(
-    records_a=records_a,
-    records_b=records_b,
-    record_id_pairs=record_id_pairs,
-    predict_proba=predict_proba,
-    num_features=4,
-    num_samples=100,
-    return_dict=True,
-    estimate_potential=True,
-    granularity="counterfactual",
-    show_progress=False,
-)
-
-
-# lemon_custom
-out_custom, stats_custom = run_explain_benchmark(explain, "lemon_custom", repeats=5, warmup=1, **EXPLAIN_KWARGS)
-exp_custom = out_custom["p0"]
-
-#lemon (Original)
-out_lemon, stats_lemon = run_explain_benchmark(lemon.explain, "lemon", repeats=5, warmup=1, **EXPLAIN_KWARGS)
-exp_lemon = out_lemon["p0"]
-
-
-
-print("\n=== BENCHMARK ===")
-print(stats_custom)
-#print(stats_lemon)
-
-
-
-
-
-
-
-
-
-def exp_to_df(exp):
-    rows = []
-    for a in exp.attributions:
-        rows.append({
-            "name": a.name,
-            "weight": float(a.weight),
-            "potential": None if a.potential is None else float(a.potential),
-            "positions": str(a.positions),
-        })
-    return pd.DataFrame(rows).sort_values("weight", ascending=False).reset_index(drop=True)
-
-
-
-
-
-print("\n=== PREDICTION SCORES ===")
-print("lemon_custom:", exp_custom.prediction_score)
-print("lemon       :", exp_lemon.prediction_score)
-
-df_c = exp_to_df(exp_custom)
-df_l = exp_to_df(exp_lemon)
-
-print("\n=== TOP ATTRIBUTIONS (custom) ===")
-print(df_c.head(10).to_string(index=False))
-
-print("\n=== TOP ATTRIBUTIONS (lemon) ===")
-print(df_l.head(10).to_string(index=False))
-
-# Join nach Feature-Name (oder alternativ nach positions, je nachdem was stabiler ist)
-merged = df_l.merge(df_c, on="name", how="outer", suffixes=("_lemon", "_custom"))
-merged["weight_diff"] = merged["weight_custom"] - merged["weight_lemon"]
-merged["potential_diff"] = merged["potential_custom"] - merged["potential_lemon"]
-
-print("\n=== DIFF (custom - lemon) ===")
-print(merged.sort_values("weight_diff", ascending=False).head(15).to_string(index=False))
-print("\n=== POTENTIAL DIFF (custom - lemon) ===")
-print(merged.sort_values("potential_diff", ascending=False).head(15).to_string(index=False))
-
-'''
-
-
-
-
-
-
+# Ausgeben der Feature welche gefunden wurden
 
 def _iter_token_spans(text: str, token_patterns="[^ ]+"):
-    # LEMON akzeptiert str oder Liste von Regex-Patterns (vereinfachter Nachbau fürs Debugging).
     patterns = [token_patterns] if isinstance(token_patterns, str) else list(token_patterns)
     pattern = "|".join(f"(?:{p})" for p in patterns)
     for m in re.finditer(pattern, text):
@@ -628,18 +438,13 @@ def _iter_token_spans(text: str, token_patterns="[^ ]+"):
 def print_feature_token_breakdown(exp, token_patterns="[^ ]+"):
     for i, a in enumerate(exp.attributions, start=1):
         print(f"\nFeature #{i}")
-        #print(f"  weight={a.weight:+.6f} | potential={a.potential} | name={a.name}")
-
         for (source, attr, attr_or_val, j) in a.positions:
             rep = exp.string_representation.get((source, attr, attr_or_val))
 
-            # Fall 1: nicht tokenisiert (z.B. numerisch, oder Granularität 'attributes')
             if rep is None or j is None or not hasattr(rep, "spans"):
                 txt = "" if rep is None else str(rep)
                 print(f"  - {source}.{attr}.{attr_or_val}: {txt!r}")
                 continue
-
-            # Fall 2: tokenisiert -> j ist Token-Index in dieser Repräsentation
             token = rep[j]  # Token-String
             start = int(rep.spans[2 * j + 1])
             end = int(rep.spans[2 * j + 2])
