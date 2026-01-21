@@ -55,13 +55,13 @@ and shouldn't be used for real explanations.
 
 ## 4 Integrated Gradients (Captum)
 
-Hinweis: Getestet mit Python 3.11 und 3.12 (empfohlen).
+Note: Tested with Python 3.11 and 3.12 (recommended).
 
 Install the requirements from requirements.txt.
 
 ## 5. Counterfactual explainer
 
-Hinweis: Getestet mit Python 3.12 (empfohlen).
+Note: Tested with Python 3.12 (recommended).
 
 If you experience errors when running the counterfactual attack script
 (e.g. TensorFlow GPU errors, libdevice missing, or NLTK lookup failures), follow the steps below.
@@ -123,6 +123,10 @@ XLA_FLAGS=--xla_gpu_cuda_data_dir=/usr/lib/cuda
 
 ## 6. Lemon
 
-Hinweis: Getestet mit Python 3.11.5 (empfohlen). Bei Python 3.12 können Build\-Fehler beim Installieren von `scikit-learn` auftreten; verwende falls nötig Python 3.11.5.
+Note: Tested with Python 3.11.5 (recommended). With Python 3.12, build errors can occur when installing scikit-learn; use Python 3.11.5 if necessary.
 
 The explanation can require a lot of RAM, therefore it is suggested to reduce num_samples or set granularity to "attributes" or "tokens".
+
+### Weitere Fehlerbehebung\: beschädigtes Modell
+
+Falls beim Laden des Modells Fehler auftreten (z.B. „weights only“), lösche models/em_bert_model.pt und lade die Datei erneut von OneDrive herunter.
