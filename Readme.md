@@ -56,7 +56,11 @@ shared embedding space outputs match / non-match predictions
 
 No retraining is required for explainability.
 
-## 4. Counterfactual explainer
+## 4 Integrated Gradients (Captum)
+
+Install the requirements from requirements.txt.
+
+## 5. Counterfactual explainer
 
 If you experience errors when running the counterfactual attack script
 (e.g. TensorFlow GPU errors, libdevice missing, or NLTK lookup failures), follow the steps below.
