@@ -3,7 +3,7 @@ from torch import nn
 """
 `em_small_test_model.py`
 Kleines Debug-/Test-Modell — NICHT für Produktion. 
-Zweck: schnelle lokale Tests, Unit-Tests und Entwicklung ohne schweren Pretrained-Backbone.
+Zweck: schnelle lokale Tests und Entwicklung ohne schweren Pretrained-Backbone.
 """
 
 

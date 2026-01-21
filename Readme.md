@@ -56,6 +56,9 @@ shared embedding space outputs match / non-match predictions
 
 No retraining is required for explainability.
 
+The small_test_model was only used for debugging purposes 
+and shouldn't be used for real explanations.
+
 ## 4 Integrated Gradients (Captum)
 
 Install the requirements from requirements.txt.

@@ -3,7 +3,7 @@
 \subsection{Motivation and Scope of the Method}
 
 
-Counterfactual explanations provide a natural and user-centric approach to explaining individual model decisions. 
+Counterfactual explanations provide a natural and user focused approach to explaining individual model decisions. 
 In general, a counterfactual explanation answers the question: 
 \emph{``What is the smallest change to the input that would change the model's prediction?''} 
 Formally, given a black-box model and an input instance, a counterfactual is defined as a minimally perturbed instance 
@@ -44,7 +44,7 @@ compatibility with the underlying transformer model.
 
 A key design choice in our implementation is the use of a span-based model wrapper that restricts perturbations 
 to a specific portion of the input text. Concretely, only one side of the entity pair is treated as mutable, 
-while the other record remains fixed throughout the attack. This is achieved via a template-based input with 
+while the other record remains fixed throughout the attack. This is achieved via a templated input with 
 a single placeholder marking the mutable span, which is modified during counterfactual generation using the 
 TextAttack framework \cite{morris2020textattack}.
 
@@ -53,7 +53,7 @@ ensuring that counterfactuals are driven by minimal, focused changes rather than
 across both records. It preserves the semantic integrity of the fixed record, serving as a stable reference 
 for interpretation, and aligns with practical workflows, where corrections are typically applied to individual records.
 
-By design, this strategy supports attribute-level interpretability: perturbations can be traced to specific fields, 
+This strategy supports attribute-level interpretability by tracing perturbations to specific fields, 
 such as names, titles, or authors. This enables a clear mapping between changes and their impact on the model's 
 duplicate decision, producing concise and actionable explanations suitable for diagnostic analysis and data quality improvement.
 
@@ -63,7 +63,6 @@ The counterfactual generation process relies on the TextFooler attack implemente
 TextFooler iteratively replaces influential tokens in the mutable span with semantically similar alternatives 
 to flip the model's prediction. In our setting, a successful attack corresponds to a counterfactual explanation: 
 a minimal textual change that alters the entity matching decision.
-
 
 To ensure interpretability and plausibility, we impose several constraints on the attack. First, 
 the proportion of perturbed tokens is limited to a maximum of 15\% of the mutable span. This sparsity 
@@ -84,7 +83,7 @@ To illustrate the behavior of our counterfactual explanation method, we present 
 qualitative examples generated using TextFooler. Figure~\ref{fig:qual_cf_examples} shows 
 several entity record pairs with minimal perturbations. The left column displays 
 the original records, while the right column contains the perturbed texts produced by the attack. 
-Each perturbation represents a counterfactual explanation: a small, targeted change that flips 
+Each perturbation represents a counterfactual explanation with a small, targeted change that flips 
 the model's duplicate/non-duplicate prediction.
 
 \begin{figure}[H]
@@ -129,7 +128,7 @@ model decisions.
 \subsection{Discussion and Limitations}
 
 This work adopts an adversarial search formulation, as implemented in TextAttack, where counterfactuals are generated 
-via iterative, query-based perturbations of individual inputs \cite{morris2020textattack}. As a result, 
+through iterative, query-based perturbations of individual inputs \cite{morris2020textattack}. As a result, 
 explanations are inherently local and computed on a single record pair at a time. Although this implies an 
 effective batch size of one, this behavior follows directly from the attack design and is appropriate for 
 producing fine-grained counterfactual explanations rather than high-throughput inference.
@@ -139,22 +138,11 @@ While similarity and sparsity constraints mitigate this issue, counterfactuals s
 of model sensitivity rather than guaranteed realistic edits.
 
 Finally, the method primarily targets textual attributes and is therefore less informative for numeric or categorical fields, 
-which are rarely perturbed. However, this limitation is less critical in the context of the used dataset (e.g., \textit{[Dataset Name]}), 
-which is dominated by rich textual attributes such as authors, titles, and venues, making text-based counterfactual generation 
+which are rarely perturbed. However, this limitation is less critical in the context of the DBLP--ACM dataset, 
+which is dominated by textual attributes such as authors, titles, and venues, making text-based counterfactual generation 
 both feasible and meaningful. While aggregating local explanations can reveal broader patterns, such summaries do not fully capture 
 dataset-wide importance or complex attribute interactions.
 
-Despite these limitations, the approach is well suited for counterfactual argumentation in entity matching, as it produces clear, 
-localized explanations that expose model sensitivities and support interpretable decision analysis.
-
-
-\subsection{Summary}
-
-We presented a method for generating span-based counterfactual explanations for entity matching models, 
-producing minimal changes to individual records that reveal attribute-level influence. 
-Qualitative examples show how small edits to fields like authors or titles can alter predictions, 
-while heatmaps highlight the most critical attributes. 
-
-Despite limitations such as computational cost and occasional semantic drift, the approach 
-provides interpretable insights that support data cleaning and enhance transparency, trust, 
-and understanding of model decisions.
+Despite these limitations, the approach is well suited for counterfactual argumentation in entity matching.
+By producing localized, minimal perturbations, it enables direct inspection of attribute-level model
+sensitivities and supports interpretable reasoning about individual matching decisions.
