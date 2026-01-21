@@ -1,4 +1,4 @@
-\subsection{LEMON\cite{lemon} (Explainable Entity Matching)}
+\section{LEMON\cite{lemon} (Explainable Entity Matching)}
 
 LEMON aims to make individual predictions of an entity matcher explainable. Formally, a matcher
 $f(x)$ returns a score in $[0,1]$ for an input pair $x=(a,b)$. A \emph{local, post-hoc attribution
@@ -12,6 +12,8 @@ the instance is first broken down into tokens, on which random perturbations are
 generated data is evaluated by the black-box model, and the resulting samples are used to train a
 regression model. The regression coefficients then indicate which tokens locally change the match
 score.
+
+\pagebreak
 
 \subsubsection{LEMON: Addressing weaknesses of LIME}
 LEMON addresses three weaknesses of LIME:
@@ -103,6 +105,6 @@ supports not only reasoning but also concrete error diagnosis in the sense of: w
 is missing or inconsistent such that the model does not match?
 
 A practical limitation is computational cost. In this configuration, explanations are only
-moderately granular and use a limited number of samples, because LEMON requires substantial RAM.
+moderately granular and use a limited number of samples, because LEMON requires substantial VRAM.
 In a complex example with $\texttt{granularity}=\texttt{"counterfactual"}$, the sample size was
-set heuristically and required allocating $16.88$~GB of RAM.
+set heuristically and required allocating $16.88$~GB of VRAM.

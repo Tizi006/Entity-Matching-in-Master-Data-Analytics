@@ -51,30 +51,20 @@ continuous importance scores that satisfy the axioms of
 \textit{completeness} and \textit{sensitivity}, revealing which 
 specific tokens drive the matching decision.
 
-\subsection{Local Linear Surrogates: LIME}
-As a model-agnostic baseline, we employ \textbf{LIME} \cite{lime}. 
-Unlike IG, which uses internal model gradients, LIME treats 
-the \textit{EMModel} as a true black box. It generates 
-interpretations by randomly perturbing the input tokens and 
-training a local ridge regression model to approximate the 
-decision boundary. This provides a comparison between 
-gradient-derived and perturbation-derived importance.
+\subsection{Local Linear Surrogates: LEMON}
+As a surrogate-based baseline, we employ \textbf{LEMON} \cite{Barlaug2023}, 
+an adaptation of LIME optimized for Entity Matching. To address the 
+limitations of standard perturbations in paired data, LEMON utilizes 
+\textbf{dual explanations} to preserve cross-record context and 
+introduces \textbf{attribution potential} to measure the sensitivity 
+of missing features in non-match predictions.
 
 \subsection{Counterfactuals: TextAttack Framework}
 To provide actionable "what-if" insights, we generate 
-counterfactual explanations using the \textbf{TextAttack} 
-framework \cite{morris2020textattack}. We utilize the 
-\textbf{TextFooler} algorithm \cite{textfooler2020} to perform 
-minimal textual substitutions that flip the model's prediction 
-(e.g., from "Match" to "Non-Match"). 
-
-
-
-We enforce a \textbf{span-based constraint}: the master record 
-from the DBLP source remains fixed, while only the ACM target 
-record is mutable. This ensures the counterfactual is 
-interpretable for data cleaning workflows, identifying 
-the exact attribute changes required to alter the matching output.
+counterfactual explanations by leveraging an adversarial 
+search paradigm. Formally, a counterfactual describes the 
+minimal modification required to change the model's 
+classification for a specific record pair \cite{wachter2017}. 
 
 \subsection{Comparative Objectives}
 Our evaluation compares these methods based on:
