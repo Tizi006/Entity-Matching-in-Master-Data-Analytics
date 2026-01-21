@@ -2,15 +2,13 @@
 
 \subsection{Motivation and Scope of the Method}
 
-
-Counterfactual explanations provide a natural and user focused approach to explaining individual model decisions. 
+Counterfactual explanations provide a natural, user-focused approach to explaining individual model decisions. 
 In general, a counterfactual explanation answers the question: 
 \emph{``What is the smallest change to the input that would change the model's prediction?''} 
 Formally, given a black-box model and an input instance, a counterfactual is defined as a minimally perturbed instance 
-that flips the original prediction \cite{Wang2022Minun}.
-
-In this work, we focus on counterfactual explanations generated through minimal textual perturbations of entity records, producing \emph{local} 
-explanations for individual record pairs rather than global model interpretability, following prior work in entity matching \cite{Wang2022Minun}.
+that flips the original prediction. Following prior work in entity matching \cite{Wang2022Minun}, 
+we focus on counterfactual explanations generated through minimal textual perturbations of entity records, 
+producing \emph{local} explanations for individual record pairs rather than global model interpretability.
 
 \subsection{Counterfactual Generation via Adversarial Text Perturbations}
 
@@ -138,7 +136,7 @@ While similarity and sparsity constraints mitigate this issue, counterfactuals s
 of model sensitivity rather than guaranteed realistic edits.
 
 Finally, the method primarily targets textual attributes and is therefore less informative for numeric or categorical fields, 
-which are rarely perturbed. However, this limitation is less critical in the context of the DBLP--ACM dataset, 
+which remain unperturbed under the applied text-based attack space. However, this limitation is less critical in the context of the DBLP--ACM dataset, 
 which is dominated by textual attributes such as authors, titles, and venues, making text-based counterfactual generation 
 both feasible and meaningful. While aggregating local explanations can reveal broader patterns, such summaries do not fully capture 
 dataset-wide importance or complex attribute interactions.
