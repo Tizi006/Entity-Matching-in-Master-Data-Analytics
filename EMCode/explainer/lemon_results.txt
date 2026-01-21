@@ -1,0 +1,164 @@
+
+=== LEMON Erklärung ===
+prediction_score: 7.204246230685385e-06
+
+Attributions:
+ weight=-0.058545 | potential=0.4131491965732455 | positions=[('a', 'title_1', 'val', None)] | name=None
+ weight=-0.086156 | potential=0.4264515909544002 | positions=[('a', 'authors_1', 'val', None)] | name=None
+ weight=+0.099058 | potential=-0.0667282593835393 | positions=[('a', 'year_1', 'val', None)] | name=None
+ weight=-0.010116 | potential=-0.09945081382861605 | positions=[('a', 'venue_1', 'val', None)] | name=None
+ weight=-0.001054 | potential=0.1475040895203914 | positions=[('b', 'authors_2', 'val', None)] | name=None
+ weight=+0.008968 | potential=0.1490703571731384 | positions=[('b', 'year_2', 'val', None)] | name=None
+ weight=+0.006664 | potential=-0.05848920117925719 | positions=[('b', 'venue_2', 'val', None)] | name=None
+ weight=-0.004596 | potential=0.03277070489856335 | positions=[('b', 'title_2', 'val', None)] | name=None
+
+
+=== LEMON Erklärung ===
+prediction_score: 8.495549081999343e-06
+
+Attributions:
+ weight=-0.059316 | potential=0.6098883123119339 | positions=[('a', 'title_1', 'val', None)] | name=None
+ weight=-0.076115 | potential=0.37898247338338553 | positions=[('a', 'authors_1', 'val', None)] | name=None
+ weight=+0.072744 | potential=-0.032026218417711465 | positions=[('a', 'year_1', 'val', None)] | name=None
+ weight=+0.009647 | potential=0.0001732684051863961 | positions=[('a', 'venue_1', 'val', None)] | name=None
+ weight=-0.022774 | potential=0.18016599225425434 | positions=[('b', 'authors_2', 'val', None)] | name=None
+ weight=+0.006274 | potential=0.20226470612649827 | positions=[('b', 'year_2', 'val', None)] | name=None
+ weight=+0.006039 | potential=0.1467487397105134 | positions=[('b', 'title_2', 'val', None)] | name=None
+ weight=+0.029125 | potential=-0.09445825826566225 | positions=[('b', 'venue_2', 'val', None)] | name=None
+
+
+=== LEMON Erklärung ===
+prediction_score: 0.9999816417694092
+
+Attributions:
+ weight=+0.589048 | potential=0.2501202183234929 | positions=[('a', 'authors_1', 'val', None)] | name=None
+ weight=+0.368036 | potential=0.16958633868203365 | positions=[('a', 'title_1', 'val', None)] | name=None
+ weight=+0.283351 | potential=0.08458304119148197 | positions=[('a', 'year_1', 'val', None)] | name=None
+ weight=+0.028356 | potential=0.09556149216472132 | positions=[('a', 'venue_1', 'val', None)] | name=None
+ weight=+0.860202 | potential=-0.09749398018470612 | positions=[('b', 'authors_2', 'val', None)] | name=None
+ weight=-0.004055 | potential=0.28610767791998043 | positions=[('b', 'venue_2', 'val', None)] | name=None
+ weight=+0.035827 | potential=0.18268228710616283 | positions=[('b', 'title_2', 'val', None)] | name=None
+ weight=+0.064660 | potential=0.05822710400455744 | positions=[('b', 'year_2', 'val', None)] | name=None
+
+=== LEMON Erklärung ===
+prediction_score: 7.420175734296208e-06
+
+Attributions:
+ weight=+0.020389 | potential=0.38656371567635806 | positions=[('a', 'authors_1', 'val', None)] | name=None
+ weight=-0.049787 | potential=0.14679528009808657 | positions=[('a', 'title_1', 'val', None)] | name=None
+ weight=+0.010038 | potential=-0.08371990736338043 | positions=[('a', 'venue_1', 'val', None)] | name=None
+ weight=+0.026430 | potential=-0.02180440126118269 | positions=[('a', 'year_1', 'val', None)] | name=None
+ weight=-0.007720 | potential=0.4451178611507107 | positions=[('b', 'year_2', 'val', None)] | name=None
+ weight=-0.014804 | potential=0.1651126484102893 | positions=[('b', 'authors_2', 'val', None)] | name=None
+ weight=+0.024608 | potential=-0.08812443654483973 | positions=[('b', 'venue_2', 'val', None)] | name=None
+ weight=+0.000928 | potential=0.011296605104128736 | positions=[('b', 'title_2', 'val', None)] | name=None
+
+
+=== LEMON Erklärung ===
+prediction_score: 8.418985089519992e-06
+
+Attributions:
+ weight=+0.009229 | potential=0.15445270167571504 | positions=[('a', 'authors_1', 'val', None)] | name=None
+ weight=-0.020578 | potential=0.08031926581050154 | positions=[('a', 'title_1', 'val', None)] | name=None
+ weight=+0.022816 | potential=-0.06333955796438771 | positions=[('a', 'year_1', 'val', None)] | name=None
+ weight=-0.010448 | potential=0.02677289636530769 | positions=[('a', 'venue_1', 'val', None)] | name=None
+ weight=+0.005793 | potential=0.498037614594916 | positions=[('b', 'authors_2', 'val', None)] | name=None
+ weight=-0.069663 | potential=0.2498068208221871 | positions=[('b', 'year_2', 'val', None)] | name=None
+ weight=+0.025321 | potential=-0.15037827400220352 | positions=[('b', 'title_2', 'val', None)] | name=None
+ weight=+0.033105 | potential=0.10035517365489298 | positions=[('b', 'venue_2', 'val', None)] | name=None
+
+
+=== LEMON Erklärung ===
+prediction_score: 0.9999808073043823
+
+Attributions:
+ weight=+0.653000 | potential=0.1739997357667225 | positions=[('a', 'authors_1', 'val', None)] | name=None
+ weight=+0.272274 | potential=0.19125321911745774 | positions=[('a', 'title_1', 'val', None)] | name=None
+ weight=+0.216227 | potential=0.08544510177343884 | positions=[('a', 'year_1', 'val', None)] | name=None
+ weight=+0.072188 | potential=0.11185566381475891 | positions=[('a', 'venue_1', 'val', None)] | name=None
+ weight=+0.860277 | potential=-0.09752425657616587 | positions=[('b', 'authors_2', 'val', None)] | name=None
+ weight=-0.004075 | potential=0.28612409532362776 | positions=[('b', 'venue_2', 'val', None)] | name=None
+ weight=+0.035792 | potential=0.1826965544906321 | positions=[('b', 'title_2', 'val', None)] | name=None
+ weight=+0.064651 | potential=0.058218813387025906 | positions=[('b', 'year_2', 'val', None)] | name=None
+
+
+=== LEMON Erklärung ===
+prediction_score: 0.9999799728393555
+
+Attributions:
+ weight=+0.528722 | potential=-0.06099294858395443 | positions=[('a', 'year_1', 'val', None)] | name=None
+ weight=+0.531170 | potential=0.22985451261706918 | positions=[('a', 'authors_1', 'val', None)] | name=None
+ weight=+0.262624 | potential=0.2689545882006525 | positions=[('a', 'title_1', 'val', None)] | name=None
+ weight=-0.049166 | potential=0.15216553807276645 | positions=[('a', 'venue_1', 'val', None)] | name=None
+ weight=+0.860895 | potential=-0.12803602988622081 | positions=[('b', 'title_2', 'val', None)] | name=None
+ weight=+0.074182 | potential=0.3313121175396828 | positions=[('b', 'authors_2', 'val', None)] | name=None
+ weight=+0.035511 | potential=0.30783677597704195 | positions=[('b', 'year_2', 'val', None)] | name=None
+ weight=-0.024481 | potential=0.16350517039208143 | positions=[('b', 'venue_2', 'val', None)] | name=None
+
+
+=== LEMON Erklärung  ===
+prediction_score: 7.3946530392277054e-06
+
+Attributions:
+ weight=-0.139989 | potential=0.9371428960160805 | positions=[('a', 'authors_1', 'val', None)] | name=None
+ weight=+0.018343 | potential=0.3895796046430204 | positions=[('a', 'title_1', 'val', None)] | name=None
+ weight=+0.053428 | potential=-0.09582693444780988 | positions=[('a', 'year_1', 'val', None)] | name=None
+ weight=-0.014097 | potential=0.04531374149943943 | positions=[('a', 'venue_1', 'val', None)] | name=None
+ weight=-0.004620 | potential=0.23753323503200946 | positions=[('b', 'authors_2', 'val', None)] | name=None
+ weight=-0.018599 | potential=0.1473107181690238 | positions=[('b', 'year_2', 'val', None)] | name=None
+ weight=+0.019573 | potential=0.022137237762824707 | positions=[('b', 'title_2', 'val', None)] | name=None
+ weight=+0.015162 | potential=0.0023264916272142384 | positions=[('b', 'venue_2', 'val', None)] | name=None
+
+
+=== LEMON Erklärung ===
+prediction_score: 7.43175496609183e-06
+
+Attributions:
+ weight=-0.000523 | potential=0.9990979479301006 | positions=[('a', 'authors_1', 'val', None)] | name=None
+ weight=+0.000218 | potential=0.0014232665719953182 | positions=[('a', 'title_1', 'val', None)] | name=None
+ weight=-0.000143 | potential=0.0015153152874775202 | positions=[('a', 'venue_1', 'val', None)] | name=None
+ weight=+0.000134 | potential=-0.0002826480122117144 | positions=[('a', 'year_1', 'val', None)] | name=None
+ weight=-0.029508 | potential=0.40557561101817363 | positions=[('b', 'year_2', 'val', None)] | name=None
+ weight=-0.016011 | potential=0.2549883023377045 | positions=[('b', 'authors_2', 'val', None)] | name=None
+ weight=+0.027385 | potential=-0.03164694701831183 | positions=[('b', 'title_2', 'val', None)] | name=None
+ weight=+0.026261 | potential=0.007793881601518962 | positions=[('b', 'venue_2', 'val', None)] | name=None
+
+
+-> counterfactual <-
+
+ === LEMON Erklärung ===
+prediction_score: 7.049955911497818e-06
+
+ weight=+0.012383 | potential=0.3589919154809498 | positions=[('a', 'authors_1', 'val', 4)] | name=None
+ weight=-0.030726 | potential=-0.052823583150882654 | positions=[('a', 'authors_1', 'val', 6)] | name=None
+ weight=-0.011131 | potential=0.08261391170810445 | positions=[('a', 'authors_1', 'val', 5)] | name=None
+ weight=-0.030130 | potential=-0.01083177277319058 | positions=[('a', 'venue_1', 'val', 2)] | name=None
+ weight=+0.019778 | potential=0.3772542258358663 | positions=[('b', 'title_2', 'val', None)] | name=None
+ weight=-0.051594 | potential=0.006021464020844458 | positions=[('b', 'year_2', 'val', None)] | name=None
+ weight=+0.038282 | potential=0.00033177718596906546 | positions=[('b', 'authors_2', 'val', None)] | name=None
+ weight=-0.027601 | potential=0.06593901646604888 | positions=[('b', 'venue_2', 'val', None)] | name=None
+
+Feature #1
+  - a.authors_1.val[4] -> 'v. jagadish' , weight=+0.012383 | potential=0.3589919154809498
+
+Feature #2
+  - a.authors_1.val[6] -> 'kapitskaia' ,  weight=-0.030726 | potential=-0.052823583150882654
+
+Feature #3
+  - a.authors_1.val[5] -> ', olga' , weight=-0.011131 | potential=0.08261391170810445
+
+Feature #4
+  - a.venue_1.val[2] -> 'firm real-time' , weight=-0.030130 | potential=-0.01083177277319058
+
+Feature #5
+  - b.title_2.val: 'hierarchical subspace sampling : a unified framework for high dimensional data reduction , selectivity estimation and nearest neighbor search‘, 
+weight=+0.019778 | potential=0.3772542258358663
+
+Feature #6
+  - b.year_2.val: '2002‘, weight=-0.051594 | potential=0.006021464020844458 
+
+Feature #7
+  - b.authors_2.val: 'charu c. aggarwal', weight=+0.038282 | potential=0.00033177718596906546
+
+Feature #8
+  - b.venue_2.val: 'international conference on management of data', weight=-0.027601 | potential=0.06593901646604888

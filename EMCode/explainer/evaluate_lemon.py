@@ -119,7 +119,7 @@ def format(df):
 
 # Datasets Qualitativ
 
-df_diff = pd.DataFrame([{ 
+df_q = pd.DataFrame([{ 
     "label": 0,
     "authors_1": "raymond t. ng , divesh srivastava , h. v. jagadish , olga kapitskaia",
     "authors_2": "charu c. aggarwal",  
@@ -405,7 +405,7 @@ for df in dfs:
 # Eine Aufwendigere Erklärng
 # -----------------------------
 
-records_a,records_b,record_id_pairs= format(df_diff)
+records_a,records_b,record_id_pairs= format(df_q)
 res=explain(
     records_a=records_a,
     records_b=records_b,
