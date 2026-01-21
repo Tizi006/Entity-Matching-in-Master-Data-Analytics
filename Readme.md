@@ -122,3 +122,7 @@ XLA_FLAGS=--xla_gpu_cuda_data_dir=/usr/lib/cuda
 - CUDA Toolkit must be installed (not only NVIDIA drivers).
 - If GPU setup fails, the attack will still run on CPU but much slower.
 - This setup was tested with CUDA installed under /usr/lib/cuda.
+
+## 6. Lemon
+
+The explanation can require a lot of RAM, therefore it is suggested to reduce num_samples or set granularity to "attributes" or "tokens".

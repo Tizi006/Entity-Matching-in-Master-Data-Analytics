@@ -8,11 +8,13 @@ import pandas as pd
 import torch
 from torch import nn
 from transformers import AutoTokenizer, AutoModel
+from EMCode.scripts.data_loader import project_root
+
+from lemon import explain
 
 
 import random
 
-from lemon_custom import explain
 
 
 # Seed setzen
@@ -23,9 +25,6 @@ np.random.seed(SEED)
 torch.manual_seed(SEED)
 if torch.cuda.is_available():
     torch.cuda.manual_seed_all(SEED)
-
-
-
 
 
 
@@ -50,7 +49,7 @@ _py_random.Random.__init__ = _patched_random_init
 
 
 
-#Daterloader
+# Dataloader
 
 def load_data_from_file(
         df,
@@ -67,9 +66,6 @@ def load_data_from_file(
         text_cols_right (list[str]): Liste der Spaltennamen für die rechte Entität.
         label_col (str): Name der Spalte, die das Label (0 oder 1) enthält.
     """
-
-
-
     formatted_data = []
 
     for _, row in df.iterrows():
@@ -103,9 +99,29 @@ def load_data_from_file(
 
     return formatted_data
 
+def infer_left_right_columns_from_df(df: pd.DataFrame):
+    # CSV-Reihenfolge beibehalten
+    left_cols = [c for c in df.columns if c.endswith("_1")]
+    right_cols = [c for c in df.columns if c.endswith("_2")]
+    return left_cols, right_cols
+
+def format(df):
+    LEFT_COLS, RIGHT_COLS = infer_left_right_columns_from_df(df)
+
+    # Für LEMON: zwei Tabellen + stabile IDs
+    records_a = df[LEFT_COLS].fillna("").astype(str).copy()
+    records_b = df[RIGHT_COLS].fillna("").astype(str).copy()
+    records_a.index = [f"a{i}" for i in range(len(records_a))]
+    records_b.index = [f"b{i}" for i in range(len(records_b))]
+
+    record_id_pairs = pd.DataFrame(
+        {"a.rid": records_a.index.to_list(), "b.rid": records_b.index.to_list()},
+        index=[f"p{i}" for i in range(len(df))]
+    )
+    return records_a,records_b, record_id_pairs
 
 
-# V
+# Datasets Qualitativ
 
 df_diff = pd.DataFrame([{ 
     "label": 0,
@@ -118,6 +134,8 @@ df_diff = pd.DataFrame([{
     "year_1": 2000,
     "year_2": 2002,  
 }])
+
+# Dataset Quantitativ
 
 dfs = [
     pd.DataFrame([{
@@ -223,26 +241,10 @@ dfs = [
 
 
 
-def infer_left_right_columns_from_df(df: pd.DataFrame):
-    # CSV-Reihenfolge beibehalten
-    left_cols = [c for c in df.columns if c.endswith("_1")]
-    right_cols = [c for c in df.columns if c.endswith("_2")]
-    return left_cols, right_cols
 
-def format(df):
-    LEFT_COLS, RIGHT_COLS = infer_left_right_columns_from_df(df)
 
-    # Für LEMON: zwei Tabellen + stabile IDs
-    records_a = df[LEFT_COLS].fillna("").astype(str).copy()
-    records_b = df[RIGHT_COLS].fillna("").astype(str).copy()
-    records_a.index = [f"a{i}" for i in range(len(records_a))]
-    records_b.index = [f"b{i}" for i in range(len(records_b))]
 
-    record_id_pairs = pd.DataFrame(
-        {"a.rid": records_a.index.to_list(), "b.rid": records_b.index.to_list()},
-        index=[f"p{i}" for i in range(len(df))]
-    )
-    return records_a,records_b, record_id_pairs
+
 
 # -----------------------------
 # 2) Tokenizer + Model laden (WICHTIG: gleich wie im Training!)
@@ -251,7 +253,8 @@ DEVICE = "cuda" if torch.cuda.is_available() else ("mps" if torch.backends.mps.i
 device = torch.device(DEVICE)
 
 MODEL_NAME = "bert-base-uncased"
-MODEL_PATH = "/Users/simon/Downloads/em_bert_model.pt"
+ROOT = project_root()
+MODEL_PATH = os.path.abspath(os.path.join(ROOT, "models/em_bert_model.pt"))
 
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 
@@ -341,9 +344,6 @@ def infer_left_right_columns_from_csv(pd_f):
     )
 
     return left_cols, right_cols
-
-
-
 
 
 
@@ -513,6 +513,7 @@ res=explain(
     predict_proba=predict_proba,
     num_features=4,
     return_dict=True,
+    num_samples=100,
     estimate_potential=True,
     granularity="counterfactual",
     show_progress=False,
