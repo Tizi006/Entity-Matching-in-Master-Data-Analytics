@@ -1,0 +1,108 @@
+\subsection{LEMON\cite{lemon} (Explainable Entity Matching)}
+
+LEMON aims to make individual predictions of an entity matcher explainable. Formally, a matcher
+$f(x)$ returns a score in $[0,1]$ for an input pair $x=(a,b)$. A \emph{local, post-hoc attribution
+explanation} is then a procedure $\lambda(f,x)$ that links parts of the input $x$ to relevance
+values (attributions) and communicates them in a way that is interpretable for humans.
+
+\subsubsection{LIME\cite{lime} as a baseline: Local surrogate models through perturbations}
+LEMON is fundamentally based on LIME. The key idea of LIME is to approximate local decision rules
+in order to explain a specific instance using an easily interpretable surrogate model. To do so,
+the instance is first broken down into tokens, on which random perturbations are generated. The
+generated data is evaluated by the black-box model, and the resulting samples are used to train a
+regression model. The regression coefficients then indicate which tokens locally change the match
+score.
+
+\subsubsection{LEMON: Addressing weaknesses of LIME}
+LEMON addresses three weaknesses of LIME:
+
+\paragraph{Cross-record interaction effects.}
+Linear regression implicitly assumes feature independence, which is often violated due to strong
+interactions between fields. LEMON therefore treats both data points individually, yielding
+\emph{dual explanations}: while one record is perturbed, the other remains constant.
+
+\paragraph{Non-match explanations.}
+For very low match scores, removing features often causes only barely measurable score changes,
+so little explanatory information is learned. LEMON replaces binary on/off perturbations with a
+three-state scheme:
+\begin{itemize}
+  \item \textbf{Present (P)} and \textbf{Absent (A)} correspond to the binary system.
+  \item \textbf{Matched (M)}: the token is copied and additionally injected into the other record.
+\end{itemize}
+Tokens are inserted at several randomly sampled positions; among these, the position with the
+highest overall prediction score is selected.
+
+\paragraph{Variation in sensitivity.}
+Depending on the pair and dataset, noticeable score changes may require perturbing many coarse
+parts, whereas explanations should ideally rely on few features. LEMON therefore selects the
+feature granularity adaptively using its own metric: the number of tokens combined into a feature
+is doubled iteratively until a maximum is reached or the metric permits selection.
+
+When tokens are combined into a feature, each associated token assumes the same state. The key
+metric is the \emph{counterfactual criterion}: an explanation should not only provide local
+weights, but also make plausible which minimal changes would move the score above (or below) the
+classification threshold. If no granularity meets the criterion, the ``best'' granularity is
+selected via a harmonic-mean criterion. This selection is performed separately for both dual
+explanations.
+
+\subsubsection{Feature search, attributions, and attribution potential}
+A forward selection procedure is used to choose the features to analyze; selected features must
+maximize the surrogate model prediction score. For each feature, the surrogate forms a baseline
+using features set to state $P$. Each feature receives two weights, computed from states $A$ and
+$M$:
+\begin{itemize}
+  \item The \emph{negated} weight obtained via $A$ defines the \textbf{attribution}, indicating
+  how much the feature contributed to the prediction of the black-box model.
+  \item The weight obtained via $M$ defines the \textbf{attribution potential}, i.e., the change
+  in prediction caused by inserting that feature into the other record.
+\end{itemize}
+
+\subsubsection{Method}
+Nine different data pairs were analyzed. Due to high computational costs, feature granularity was
+fixed at the attribute level. An additional training pair was evaluated using an increased sample
+size and adaptive granularity.
+
+\subsubsection{Results}
+If the input is formatted incorrectly such that contents of data points 1 and 2 are mixed, the
+model consistently returns a negative prediction because it effectively no longer processes a
+consistent comparison pair. Such a pipeline error is easily identified with LEMON: if weights and
+potentials remain close to $0$ across all attributes, perturbations of the model input have
+virtually no influence on the output. This indicates that the decision is not data-driven but
+dominated by a structural input error.
+
+Negative values shift the decision towards \emph{non-match}, whereas positive values support
+\emph{match}.
+
+\paragraph{Model behaviour and score characteristics.}
+Model outputs are highly saturated and form two clusters: non-match scores of approximately
+$7\cdot 10^{-6}$ to $8.5\cdot 10^{-6}$, and match scores around $0.99998$. This extreme confidence
+suggests that in the saturated regime, small input changes only slightly affect the score.
+Accordingly, removal-based attributions can be insensitive in some cases. Here, \emph{attribution
+potential} provides clear additional value as a counterfactual signal, because it is more
+sensitive.
+
+Across match cases, \texttt{authors} and \texttt{title} consistently dominate as the strongest
+positive contributors, while \texttt{year} sometimes contributes significantly but is less stable.
+The decisiveness of \texttt{authors} and \texttt{title} is also visible in non-match examples via
+high attribution potential. In contrast, \texttt{venue} typically contributes little and can even
+be slightly negative. Overall, this corresponds to a matcher where author/title proximity are the
+main anchors, year acts as a case-dependent constraint, and venue is secondary or prone to noise.
+
+\paragraph{Interpretability and limitations.}
+LEMON yields useful but partially limited explanations of the model decisions. A key strength is
+the stable and consistent weighting logic across cases: the same attribute groups repeatedly
+appear as dominant drivers, and weight signs are largely plausible in non-match cases. This
+produces a comprehensible reasoning trail and reduces the black-box character of the decision to
+a few central fields.
+
+The most important added value in these results is the attribution potential. Especially for
+extremely saturated probabilities close to $0$, pure removal attributions often lack sensitivity.
+The potential compensates for this: in several non-match examples it is very high for specific
+fields (in some cases close to $1.0$), enabling a counterfactual interpretation. LEMON thus
+supports not only reasoning but also concrete error diagnosis in the sense of: which information
+is missing or inconsistent such that the model does not match?
+
+A practical limitation is computational cost. In this configuration, explanations are only
+moderately granular and use a limited number of samples, because LEMON requires substantial RAM.
+In a complex example with $\texttt{granularity}=\texttt{"counterfactual"}$, the sample size was
+set heuristically and required allocating $16.88$~GB of RAM.
