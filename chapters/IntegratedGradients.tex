@@ -2,9 +2,9 @@
 
 \subsection{Captum: A Framework for Model Interpretability}
 
-Captum is an open-source interpretability library developed by Facebook AI Research for PyTorch-based models \cite{kokhlikyan2020captum}. It provides a unified interface for a wide range of feature attribution and explanation methods. Captum is designed to be model-agnostic within the PyTorch ecosystem and supports both computer vision and natural language processing (NLP) tasks.
+Captum is an open-source interpretability library developed by Facebook AI Research for PyTorch-based models~\cite{kokhlikyan2020captum}. It provides a unified interface for a wide range of feature attribution and explanation methods. Captum is designed to be model-agnostic within the PyTorch ecosystem and supports both computer vision and natural language processing (NLP) tasks.
 
-A key advantage of Captum is its native support for \emph{Integrated Gradients (IG)}, a theoretically grounded attribution method that satisfies desirable axiomatic properties such as sensitivity and completeness \cite{sundararajan2017axiomatic}. For NLP applications, Captum allows IG to be computed directly in the \emph{embedding space}, which is crucial for models that operate on dense vector representations rather than discrete tokens. This makes Captum particularly suitable for explainability in entity matching systems based on deep neural architectures such as Transformers or Siamese networks.
+A key advantage of Captum is its native support for \emph{Integrated Gradients (IG)}, a theoretically grounded attribution method that satisfies desirable axiomatic properties such as sensitivity and completeness~\cite{sundararajan2017axiomatic}. For NLP applications, Captum allows IG to be computed directly in the \emph{embedding space}, which is crucial for models that operate on dense vector representations rather than discrete tokens. This makes Captum particularly suitable for explainability in entity matching systems based on deep neural architectures such as Transformers or Siamese networks.
 
 \subsection{Integrated Gradients: Definition and Intuition}
 
@@ -25,23 +25,25 @@ where:
 
 The resulting attribution score quantifies how much each feature contributes to the change in the model’s prediction from the baseline to the input.
 
+\pagebreak
+
 \subsection{The Role of the Baseline $x'$}
 
 Integrated Gradients explains \emph{the difference in prediction between the baseline and the input}, rather than the absolute prediction itself. Consequently, the choice of baseline is critical and directly affects the semantic validity of the explanation.
 
 \paragraph{Relative Zero Point}
 
-The baseline represents a \emph{relative zero point} for attribution. It must not convey meaningful information or semantic context. A naive choice such as a zero vector (null matrix) can be problematic, especially in NLP. If such values were never observed during training, the model may interpret them as out-of-distribution noise rather than the absence of information, leading to distorted attributions \cite{kindermans2019reliability}.
+The baseline represents a \emph{relative zero point} for attribution. It must not convey meaningful information or semantic context. A naive choice such as a zero vector (null matrix) can be problematic, especially in NLP. If such values were never observed during training, the model may interpret them as out-of-distribution noise rather than the absence of information, leading to distorted attributions~\cite{kindermans2019reliability}.
 
 \paragraph{Information vs. Absence of Information}
 
-An effective baseline should encode \emph{informational absence}, not alternative information. In NLP models, embeddings are learned representations with structured geometry; therefore, a zero embedding does not necessarily correspond to ``no token.'' Instead, padding tokens such as \texttt{[PAD]}, which are explicitly introduced during training and masked appropriately, more reliably represent the absence of semantic content \cite{wallace2019trick}.
+An effective baseline should encode \emph{informational absence}, not alternative information. In NLP models, embeddings are learned representations with structured geometry; therefore, a zero embedding does not necessarily correspond to ``no token.'' Instead, padding tokens such as \texttt{[PAD]}, which are explicitly introduced during training and masked appropriately, more reliably represent the absence of semantic content~\cite{wallace2019trick}.
 
 \subsection{Saturation and the Need for Integration}
 
 A central motivation for Integrated Gradients is the \emph{saturation problem} of standard gradient-based explanations. When a model is highly confident in its prediction (e.g., output probability close to $0.99$), the gradient at the input $x$ may be near zero due to local flatness of the decision function. Relying solely on this gradient would incorrectly suggest that the input features are unimportant.
 
-Integrated Gradients mitigates this issue by accumulating gradients \emph{along the entire path} from the baseline (where the prediction may be low, e.g., $0.1$) to the final input. This captures how the model’s confidence evolves throughout the input space, providing a faithful attribution even in saturated regions of the function \cite{sundararajan2017axiomatic}.
+Integrated Gradients mitigates this issue by accumulating gradients \emph{along the entire path} from the baseline (where the prediction may be low, e.g., $0.1$) to the final input. This captures how the model’s confidence evolves throughout the input space, providing a faithful attribution even in saturated regions of the function~\cite{sundararajan2017axiomatic}.
 
 \subsection{Practical Implementation in Captum}
 
@@ -95,7 +97,7 @@ MASK  & \textbf{0.502600} & \textbf{0.4197} & \textbf{7.33} \\
 
 Across all three metrics, the \texttt{[PAD]} and \texttt{[MASK]} baselines consistently outperform the zero baseline. Both token-based baselines exhibit significantly lower convergence deltas, indicating improved numerical faithfulness with respect to the Completeness Axiom. Furthermore, they yield lower attribution variance, suggesting more stable explanations.
 
-The zero baseline performs worst across all metrics, supporting the hypothesis that a null embedding does not represent true informational absence and may instead introduce out-of-distribution noise. This aligns with prior findings that inappropriate baselines can lead to unreliable saliency maps in gradient-based explanation methods \cite{kindermans2019reliability}.
+The zero baseline performs worst across all metrics, supporting the hypothesis that a null embedding does not represent true informational absence and may instead introduce out-of-distribution noise~\cite{kindermans2019reliability}. This aligns with prior findings that inappropriate baselines can lead to unreliable saliency maps in gradient-based explanation methods.
 
 Between the token-based baselines, \texttt{[MASK]} and \texttt{[PAD]} show largely similar behavior, with \texttt{[MASK]} exhibiting a consistent but modest advantage. As shown in Table~\ref{tab:baseline_comparison}, both baselines achieve substantially lower average convergence deltas and standard deviations than the zero baseline, indicating more faithful and stable attributions. At the same time, \texttt{[MASK]} attains slightly lower values for both metrics (average convergence delta of $0.50$ compared to $0.77$, and average standard deviation of $0.42$ compared to $0.81$), suggesting marginally improved numerical convergence and attribution stability.
 
@@ -107,6 +109,8 @@ Both \texttt{[MASK]} and \texttt{[PAD]} also result in comparably low structural
 These results provide empirical evidence that baseline selection substantially affects the quality of Integrated Gradients explanations in entity matching tasks. Token-based baselines that are part of the model’s training distribution yield more faithful, stable, and semantically grounded attributions than a zero vector baseline. The superior performance of the \texttt{[MASK]} baseline suggests that baselines designed to model missing information during pretraining are particularly well-suited for attribution methods in Transformer-based NLP models.
 
 Consequently, we adopt \texttt{[MASK]} as the default baseline for all subsequent explanation analyses for IG in this work.
+
+\pagebreak
 
 \subsection{Using Integrated Gradients for Decision Explanation}
 
@@ -121,7 +125,7 @@ The input to the model consists of paired attribute columns for two entities, sp
 \texttt{title\_1}: ``a cost model for clustered object-oriented databases'' \\
 \texttt{title\_2}: ``index configuration in object-oriented databases'' \\
 \texttt{venue\_1}: ``vldb'' \\
-\texttt{venue\_2}: ``the vldb journal -- the international journal on very large data bases'' \\
+\texttt{venue\_2}: ``the vldb journal---the international journal on very large data bases'' \\
 \texttt{year\_1}: ``1995'' \\
 \texttt{year\_2}: ``1994''
 \end{quote}

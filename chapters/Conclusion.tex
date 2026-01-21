@@ -1,8 +1,60 @@
 \section{Conclusion}
-In this paper, we investigated the interpretability of Transformer-based models for Entity Matching (EM) by applying and comparing two distinct explainability paradigms: gradient-based feature attribution and adversarial counterfactual explanations.
 
-Our analysis of Integrated Gradients (IG) demonstrated that the choice of baseline is critical for the fidelity of explanations in NLP-driven EM. By utilizing a [MASK] token baseline, we achieved numerically stable and semantically grounded attributions that adhere to the Completeness Axiom. The aggregation of token-level scores into attribute-level relevance confirmed that our model relies heavily on the semantic overlap of textual fields like \textit{title} and \textit{venue}, while also highlighting the interactive nature of matching decisions, where evidence is often distributed across both entities in a pair.
+This study benchmarks \textbf{LEMON}, \textbf{Integrated Gradients}, and 
+\textbf{Counterfactuals} for Transformer-based Entity Matching. 
+Evaluating these methods against our core objectives of \textit{fidelity}, 
+\textit{stability}, and \textit{usability}, we demonstrate their distinct 
+roles in explaining complex matching decisions in master data analytics.
 
-Complementary to this, our approach to Counterfactual Explanations via adversarial perturbations (TextFooler) provided actionable, human-readable insights. By enforcing a span-based locality constraint, we were able to generate minimal edits that directly reveal the model's sensitivity to specific attribute changes. Our quantitative heatmap analysis of these perturbations aligned with the IG results, identifying the \textit{title} as the most influential field for classification flips, while numeric fields such as the \textit{year} remained relatively stable.
+\subsection{Comparative Findings}
+\begin{itemize}
+    \item \textbf{Fidelity:} \textbf{Integrated Gradients (IG)} achieved 
+    superior numerical fidelity. By satisfying the Completeness Axiom through 
+    an optimized \texttt{[MASK]} baseline, we reduced the convergence delta 
+    to \textbf{0.50}, significantly outperforming the zero-vector baseline 
+    ($\Delta \approx 1.91$). This ensures mathematical reliability even in 
+    saturated probability regions, whereas \textbf{LEMON} required a 
+    specialized \textit{attribution potential} metric to extract meaningful 
+    signals from non-match predictions.
+    
+    \item \textbf{Stability:} Both methods demonstrated high stability through 
+    different mechanisms. IG's path integration yielded a low attribution 
+    standard deviation of \textbf{0.42}, effectively smoothing out gradient 
+    noise. \textbf{LEMON} achieved stability by aggregating token-level 
+    perturbations into coherent attribute features via its dual-explanation 
+    strategy, albeit at a higher memory cost (requiring significant VRAM 
+    for counterfactual granularity).
+    
+    \item \textbf{Usability:} \textbf{Counterfactuals} offered the most 
+    actionable insights for human-in-the-loop validation. By restricting 
+    perturbations to a \textbf{15\% span budget}, they isolated minimal 
+    textual ``flips'' that are immediately understandable for data stewards. 
+    In contrast, IG's aggregated visualizations provided a superior global 
+    overview, correctly identifying systemic model biases---such as the 
+    consistently low relevance of the \textit{Venue} attribute in attributions 
+    (though it shows high sensitivity in perturbations, indicating potential 
+    for flips).
+\end{itemize}
 
-In summary, the combination of these methods offers a robust framework for auditing EM models: while Integrated Gradients provides a comprehensive overview of feature importance, Counterfactuals offer concrete, "what-if" scenarios that are essential for data debugging and increasing user trust in master data management systems.
+\paragraph{Limitation on Runtime Analysis:} 
+It should be noted that \textbf{computational efficiency} (runtime) was 
+explicitly excluded from this comparative analysis. As the explanation 
+modules were executed on heterogeneous hardware environments, a 
+standardized, comparable measurement of inference speed was not feasible. 
+Consequently, our evaluation focuses strictly on the qualitative 
+dimensions of fidelity, stability, and usability.
+
+\subsection{Model Behavior}
+Our cross-method analysis confirms that the BERT-based model acts as a 
+"text-first" matcher. All three explainers converged on the finding that 
+\textit{Title} and \textit{Authors} serve as the primary anchors for 
+decision-making, while numeric fields like \textit{Year} act largely as 
+secondary filters. 
+
+Since meaningful explanations often required analyzing comparative 
+interactions rather than isolated attributes, we advocate for a 
+\textbf{hybrid explanation pipeline}, particularly for ambiguous 
+record pairs. In such a framework, \textbf{Integrated Gradients} 
+serves as a tool for technical auditing and bias detection, while 
+\textbf{Counterfactuals} provide the concrete evidence needed for 
+operational data stewardship.
