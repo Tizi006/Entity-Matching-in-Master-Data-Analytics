@@ -1,65 +1,88 @@
 \section{Methodology}
-Our experimental framework utilizes \textit{DeepMatcher} 
-as the primary black-box model. We focus on three 
-distinct categories of feature attribution and 
-instance-based explanations to evaluate the 
-transparency-performance trade-off in Entity Matching. 
-The objective is to identify which method provides 
-the highest \textbf{fidelity} while maintaining 
-computational \textbf{efficiency} suitable for 
-large-scale master data.
+Our methodology follows a comparative framework designed to 
+evaluate three distinct interpretability paradigms: gradient-based 
+attribution, local linear surrogates, and counterfactual 
+perturbations. This section details our model architecture, 
+data serialization, and the technical implementation of our 
+explanation modules.
 
-\subsection{SHAP (Shapley Additive Explanations)}
-SHAP, introduced by Lundberg and Lee \cite{shap}, is 
-rooted in cooperative game theory. It calculates 
-the marginal contribution of each attribute (e.g., 
-"Product Name") across all possible feature 
-permutations. We employ SHAP to achieve 
-mathematically consistent importance scores. While 
-theoretically superior in accuracy, its 
-computational complexity is a primary concern 
-for our benchmark comparison.
-
-\subsection{LIME (Local Interpretable Model-agnostic Explanations)}
-LIME, proposed by Ribeiro et al. \cite{lime}, 
-approximates the decision boundary of 
-DeepMatcher locally using a linear surrogate model. 
-By perturbing the tokens within a record pair, 
-LIME identifies which specific string segments 
-drive a "Match" prediction. We aim to determine 
-if LIME's speed advantage over SHAP compensates 
-for potential losses in global consistency.
-
-\subsection{Adversarial Counterfactual Explanations}
-Following the counterfactual framework defined by Wachter 
-et al. \cite{wachter2017}, we implement a \textbf{Span-based 
-Adversarial Perturbation} strategy. Rather than assigning 
-importance weights, this method seeks the \textit{minimal 
-textual change} required to flip the model's decision.
+\subsection{Dataset and Input Serialization}
+We utilize the structured \textbf{DBLP-ACM} benchmark dataset 
+from the Magellan repository \cite{li2020ditto}. The dataset 
+comprises bibliographic records with four attributes: 
+\textit{Title}, \textit{Authors}, \textit{Venue}, and \textit{Year}.
 
 
 
-We utilize the \textit{TextAttack} framework \cite{textattack2020} 
-with the \textit{TextFooler} algorithm \cite{textfooler2020} to 
-generate these explanations. A key methodological constraint 
-is the use of a \textbf{mutable span}: we fix one record and 
-perturb only the other. This enforces:
-\begin{itemize}
-    \item \textbf{Locality:} Focused changes rather than 
-    distributed noise.
-    \item \textbf{Actionability:} Clear "what-if" scenarios 
-    for data stewards to correct specific record entries.
-\end{itemize}
+To process these records with a Transformer architecture, we 
+serialize each entity pair $(e_a, e_b)$ into a single sequence. 
+Attributes are prefixed with their labels and concatenated using 
+the \texttt{[SEP]} token:
+\begin{center}
+\small \texttt{[CLS] Title: A [SEP] Title: B ... [SEP]}
+\end{center}
+This format allows the model's self-attention mechanism to 
+perform cross-attribute comparison directly within the hidden layers.
+
+\subsection{Black-Box Model: Transformer-based EMModel}
+Our primary matching engine is a custom PyTorch-based 
+\textit{EMModel}. The architecture leverages the 
+\textit{bert-base-uncased} backbone \cite{devlin2019bert} 
+containing 12 layers and 110M parameters.
+
+
+
+The model processes the serialized input and extracts the 
+final hidden state of the \texttt{[CLS]} token, denoted 
+as $h_{[CLS]} \in \mathbf{text}{R}^{768}$, which serves as the 
+aggregate semantic representation of the record pair. This 
+vector is passed through a linear dropout layer and a 
+classification head:
+\[ P(\text{match}) = \text{Softmax}(W \cdot h_{[CLS]} + b) \]
+where $W$ and $b$ are the weights and biases of the final layer.
+
+\subsection{Feature Attribution: Integrated Gradients}
+We implement \textbf{Integrated Gradients (IG)} \cite{sundararajan2017axiomatic} 
+via the \textbf{Captum} library \cite{kokhlikyan2020captum}. IG 
+calculates the integral of gradients along a straight-line path 
+from a baseline $x'$ to the input $x$. In our implementation, we 
+apply IG directly to the word embedding layer. This produces 
+continuous importance scores that satisfy the axioms of 
+\textit{completeness} and \textit{sensitivity}, revealing which 
+specific tokens drive the matching decision.
+
+\subsection{Local Linear Surrogates: LIME}
+As a model-agnostic baseline, we employ \textbf{LIME} \cite{lime}. 
+Unlike IG, which uses internal model gradients, LIME treats 
+the \textit{EMModel} as a true black box. It generates 
+interpretations by randomly perturbing the input tokens and 
+training a local ridge regression model to approximate the 
+decision boundary. This provides a comparison between 
+gradient-derived and perturbation-derived importance.
+
+\subsection{Counterfactuals: TextAttack Framework}
+To provide actionable "what-if" insights, we generate 
+counterfactual explanations using the \textbf{TextAttack} 
+framework \cite{morris2020textattack}. We utilize the 
+\textbf{TextFooler} algorithm \cite{textfooler2020} to perform 
+minimal textual substitutions that flip the model's prediction 
+(e.g., from "Match" to "Non-Match"). 
+
+
+
+We enforce a \textbf{span-based constraint}: the master record 
+from the DBLP source remains fixed, while only the ACM target 
+record is mutable. This ensures the counterfactual is 
+interpretable for data cleaning workflows, identifying 
+the exact attribute changes required to alter the matching output.
 
 \subsection{Comparative Objectives}
-We compare these three methods specifically on their ability to 
-handle the "short-text" nature of master data. Our evaluation 
-metrics focus on:
-\begin{enumerate}
-    \item \textbf{Fidelity:} Does the explanation accurately 
-    locate the model's sensitivity?
-    \item \textbf{Speed:} Can the method scale to thousands of 
-    record comparisons per second?
-    \item \textbf{Interpretability:} Does the output (weight vs. 
-    flipped text) provide better diagnostic value for a human user?
-\end{enumerate}
+Our evaluation compares these methods based on:
+\begin{itemize}
+    \item \textbf{Fidelity:} The accuracy with which the explanation 
+    represents the model's sensitivity.
+    \item \textbf{Stability:} The consistency of the results 
+    across similar record pairs.
+    \item \textbf{Usability:} The clarity of the output for 
+    human-in-the-loop validation.
+\end{itemize}

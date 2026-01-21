@@ -1,19 +1,41 @@
 \section{Introduction}
-Entity Matching (EM), the task of identifying records that refer to the same real-world entity, is a cornerstone of modern data integration pipelines.
-As organizations increasingly migrate to cloud-based data ecosystems, the necessity of consolidating heterogeneous data sources has become paramount.
- While traditional EM approaches relied on heuristic rules or manual feature engineering, the state-of-the-art has shifted toward deep learning architectures.
-Models such as \textit{DeepMatcher} utilize bidirectional Gated Recurrent Units (GRUs) and attention mechanisms to achieve unprecedented accuracy in identifying duplicates across noisy datasets.
+Entity Matching (EM), the task of identifying records that refer to the 
+same real-world entity, is a cornerstone of modern data integration 
+pipelines. As organizations increasingly migrate to cloud-based data 
+ecosystems, the necessity of consolidating heterogeneous data sources 
+has become paramount. While traditional EM approaches relied on 
+heuristic rules or manual feature engineering, the state-of-the-art 
+has shifted toward sophisticated deep learning architectures. 
+Modern frameworks increasingly leverage Transformer-based models, 
+such as BERT, which utilize self-attention mechanisms to achieve 
+unprecedented accuracy in identifying duplicates across noisy and 
+unstructured datasets.
+
+Despite these performance gains, these models operate as "black boxes." 
+Their decision-making processes are embedded within high-dimensional 
+vector spaces and complex non-linear transformations, offering no 
+inherent transparency. In industrial applications, this lack of 
+interpretability poses significant risks, particularly regarding 
+data governance, accountability, and the "right to explanation" 
+under regulatory frameworks like the GDPR. As highlighted in a 
+recent overview by Araújo et al. \cite{Araujo2025}, ensuring 
+fairness and transparency in EM is critical for the deployment of 
+trustworthy data integration systems.
 
 
-Despite these performance gains, these models operate as "black boxes." Their decision-making processes are embedded within high-dimensional
-vector spaces and non-linear transformations, offering no inherent transparency. In industrial applications, this lack of interpretability
-poses significant risks, particularly regarding data governance, accountability, and the "right to explanation"
-under regulatory frameworks like the GDPR \cite{Araujo2025Fairness}.
 
-This research addresses the transparency-performance tradeoff by evaluating post-hoc explainability techniques applied to a fixed EM model.
-We investigate the efficacy of \textbf{LIME} (Local Interpretable Model-agnostic Explanations), \textbf{SHAP} (Shapley Additive Explanations),
-and \textbf{Similarity Attribution}. By benchmarking these methods against established EM datasets, we provide a comparative analysis of their \textit{fidelity}, \textit{stability}, and \textit{usability}. 
-The goal is to establish a framework that not only identifies duplicates but also justifies the underlying logic, thereby facilitating system debugging and increasing stakeholder trust.
+This research addresses the transparency-performance tradeoff by 
+evaluating post-hoc explainability techniques applied to a fixed 
+Transformer-based EM model. We investigate the efficacy of 
+\textbf{LIME} (Local Interpretable Model-agnostic Explanations), 
+\textbf{Integrated Gradients} (a gradient-based attribution method 
+implemented via Captum), and \textbf{Adversarial Counterfactuals} 
+(generated through the TextAttack framework). 
 
-
-
+By benchmarking these methods against established EM datasets, we 
+provide a comparative analysis of their \textit{fidelity}, 
+\textit{stability}, and \textit{usability}. Our goal is to 
+establish a framework that not only identifies duplicates but 
+also justifies the underlying logic through actionable insights, 
+thereby facilitating system debugging and increasing stakeholder 
+trust in automated master data management.

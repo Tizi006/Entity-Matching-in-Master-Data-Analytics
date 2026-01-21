@@ -1,7 +1,8 @@
 \section{Conclusion}
-In this project, we investigated explainable entity matching by applying black-box explainers such as SHAP, LIME, and related methods to a fixed EM model. 
-We ran a set of benchmark EM datasets through a black-box model, 
-generated local explanations for its duplicate and non-duplicate predictions, and compared these explanation methods with respect to fidelity, 
-stability, and usability. We further visualized the explanations to make the decision process of the EM model accessible to human users. 
-The overall objective was to implement and evaluate interpretable methods that clearly explain why two records are classified as duplicates or not, 
-thereby increasing trust in EM systems and supporting users in debugging, validating, and improving data integration pipelines.
+In this paper, we investigated the interpretability of Transformer-based models for Entity Matching (EM) by applying and comparing two distinct explainability paradigms: gradient-based feature attribution and adversarial counterfactual explanations.
+
+Our analysis of Integrated Gradients (IG) demonstrated that the choice of baseline is critical for the fidelity of explanations in NLP-driven EM. By utilizing a [MASK] token baseline, we achieved numerically stable and semantically grounded attributions that adhere to the Completeness Axiom. The aggregation of token-level scores into attribute-level relevance confirmed that our model relies heavily on the semantic overlap of textual fields like \textit{title} and \textit{venue}, while also highlighting the interactive nature of matching decisions, where evidence is often distributed across both entities in a pair.
+
+Complementary to this, our approach to Counterfactual Explanations via adversarial perturbations (TextFooler) provided actionable, human-readable insights. By enforcing a span-based locality constraint, we were able to generate minimal edits that directly reveal the model's sensitivity to specific attribute changes. Our quantitative heatmap analysis of these perturbations aligned with the IG results, identifying the \textit{title} as the most influential field for classification flips, while numeric fields such as the \textit{year} remained relatively stable.
+
+In summary, the combination of these methods offers a robust framework for auditing EM models: while Integrated Gradients provides a comprehensive overview of feature importance, Counterfactuals offer concrete, "what-if" scenarios that are essential for data debugging and increasing user trust in master data management systems.

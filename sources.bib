@@ -1,188 +1,196 @@
-@article{Araujo2025Fairness,
-  author  = {Ara{\'u}jo, T. and Efthymiou, V. and Stefanidis, K.},
+% --- Foundational & Structural Entity Matching ---
+
+@article{fellegi1969,
+  author  = {Fellegi, Ivan P. and Sunter, Alan B.},
+  journal = {Journal of the American Statistical Association},
+  title   = {A Theory for Record Linkage},
+  volume  = {64},
+  number  = {328},
+  pages   = {1183--1210},
+  year    = {1969}
+}
+
+@inproceedings{deepmatcher,
+  author    = {Mudgal, Sidharth and others},
+  title     = {Deep Learning for Entity Matching: A Design Space Exploration},
+  booktitle = {Proceedings of SIGMOD},
+  year      = {2018},
+  doi       = {10.1145/3183713.3196926}
+}
+
+@inproceedings{li2020ditto,
+  author    = {Li, Yuliang and others},
+  title     = {Deep Entity Matching with Pre-trained Language Models},
+  booktitle = {Proceedings of SIGMOD},
+  year      = {2020}
+}
+
+@article{Koumarelas2020,
+  author  = {Koumarelas, I. and Papenbrock, T. and Naumann, F.},
+  title   = {MDedup: Duplicate Detection with Matching Dependencies},
+  journal = {Proc. VLDB Endow.},
+  volume  = {13},
+  number  = {5},
+  year    = {2020}
+}
+
+@misc{Bahmani2016,
+  author       = {Bahmani, Z. and others},
+  title        = {ERBlox: Combining Matching Dependencies with Machine Learning},
+  howpublished = {CoRR, arXiv:1602.02334},
+  year         = {2016}
+}
+
+@article{Ravikanth2024,
+  author  = {Ravikanth, M. and others},
+  title   = {An Efficient Learning-Based Approach for Automatic Record Deduplication},
+  journal = {Scientific Reports},
+  volume  = {14},
+  year    = {2024}
+}
+
+% --- Transformers & NLP ---
+
+@inproceedings{vaswani2017attention,
+  author    = {Vaswani, Ashish and others},
+  booktitle = {Advances in NeurIPS},
+  title     = {Attention is All You Need},
+  year      = {2017}
+}
+
+@inproceedings{devlin2019bert,
+  author    = {Devlin, Jacob and others},
+  booktitle = {Proceedings of NAACL},
+  title     = {BERT: Pre-training of Deep Bidirectional Transformers},
+  year      = {2019}
+}
+
+@inproceedings{wolf2020transformers,
+  author    = {Wolf, Thomas and others},
+  booktitle = {Proceedings of EMNLP: System Demonstrations},
+  title     = {Transformers: State-of-the-Art NLP},
+  year      = {2020}
+}
+
+% --- XAI Methods & Frameworks ---
+
+@inproceedings{lime,
+  author    = {Ribeiro, Marco Tulio and others},
+  booktitle = {Proceedings of ACM SIGKDD},
+  title     = {"Why Should I Trust You?": Explaining Predictions},
+  year      = {2016}
+}
+
+@inproceedings{shap,
+  author    = {Lundberg, Scott M. and Lee, Su-In},
+  booktitle = {Advances in NeurIPS},
+  title     = {A Unified Approach to Interpreting Model Predictions},
+  year      = {2017}
+}
+
+@article{wachter2017,
+  author  = {Wachter, Sandra and others},
+  journal = {Harvard Journal of Law \& Technology},
+  title   = {Counterfactual Explanations without Opening the Black Box},
+  year    = {2017},
+  volume  = {31}
+}
+
+@inproceedings{sundararajan2017axiomatic,
+  author    = {Sundararajan, Mukund and others},
+  title     = {Axiomatic Attribution for Deep Networks},
+  booktitle = {Proceedings of ICML},
+  year      = {2017}
+}
+
+@article{kokhlikyan2020captum,
+  author  = {Kokhlikyan, Narine and others},
+  title   = {Captum: A unified and generic model interpretability library for PyTorch},
+  journal = {arXiv preprint arXiv:2009.07896},
+  year    = {2020}
+}
+
+% --- Adversarial NLP (Counterfactuals) ---
+
+@inproceedings{morris2020textattack,
+  author    = {Morris, John and others},
+  title     = {TextAttack: A Framework for Adversarial Attacks},
+  booktitle = {Proceedings of EMNLP: System Demonstrations},
+  year      = {2020}
+}
+
+@inproceedings{textfooler2020,
+  author    = {Jin, Di and others},
+  title     = {Is BERT Really Robust? A Strong Baseline for NLP Attack},
+  booktitle = {Proceedings of AAAI},
+  year      = {2020}
+}
+
+% --- Domain-Specific EM XAI ---
+
+@article{Araujo2025,
+  author  = {Araújo, T. and others},
   title   = {Fairness and Explanations in Entity Resolution: An Overview},
   journal = {IEEE Access},
-  volume  = {PP},
-  pages   = {1--1},
   year    = {2025},
   doi     = {10.1109/ACCESS.2025.3599990}
 }
 
-@article{Barlaug2023LEMON,
+@article{Barlaug2023,
   author  = {Barlaug, N.},
   title   = {LEMON: Explainable Entity Matching},
-  journal = {IEEE Transactions on Knowledge and Data Engineering},
+  journal = {IEEE TKDE},
   volume  = {35},
-  number  = {8},
-  pages   = {8171--8184},
-  year    = {2023},
-  doi     = {10.1109/TKDE.2022.3200644}
+  year    = {2023}
 }
 
-@article{Koumarelas2020MDedup,
-  author  = {Koumarelas, I. and Papenbrock, T. and Naumann, F.},
-  title   = {MDedup: Duplicate Detection with Matching Dependencies},
-  journal = {Proceedings of the VLDB Endowment},
-  volume  = {13},
-  number  = {5},
-  pages   = {712--725},
-  year    = {2020},
-  doi     = {10.14778/3377369.3377379}
+@inproceedings{exmatchina2021,
+  author    = {Singh, Kushagra and others},
+  title     = {ExMatchina: Explainable Entity Matching},
+  booktitle = {Proceedings of SIGMOD},
+  year      = {2021}
 }
 
-@misc{Bahmani2016ERBlox,
-  author       = {Bahmani, Z. and Bertossi, L. E. and Vasiloglou, N.},
-  title        = {ERBlox: Combining Matching Dependencies with Machine Learning for Entity Resolution},
-  howpublished = {CoRR, arXiv:1602.02334},
-  year         = {2016},
-  note         = {\url{http://arxiv.org/abs/1602.02334}}
-}
-
-@article{Ravikanth2024Deduplication,
-  author  = {Ravikanth, M. and Korra, S. and Mamidisetti, G. and others},
-  title   = {An Efficient Learning-Based Approach for Automatic Record Deduplication},
-  journal = {Scientific Reports},
-  volume  = {14},
-  pages   = {16254},
-  year    = {2024},
-  doi     = {10.1038/s41598-024-63242-1}
+@inproceedings{thirumuruganathan2022,
+  author    = {Thirumuruganathan, Saravanan and others},
+  title     = {Explaining Deep Entity Matching Decisions},
+  booktitle = {Proceedings of SIGMOD},
+  year      = {2022}
 }
 
 @inproceedings{Wang2022Minun,
   author    = {Wang, J. and Li, Y.},
   title     = {Minun: Evaluating Counterfactual Explanations for Entity Matching},
-  booktitle = {Proceedings of the Workshop on Data Management for End-to-End Machine Learning (DEEM)},
-  pages     = {1--11},
-  year      = {2022},
-  doi       = {10.1145/3533028.3533304}
+  booktitle = {Proceedings of the DEEM Workshop},
+  year      = {2022}
 }
 
-@inproceedings{Baraldi2023Interpretable,
-  author    = {Baraldi, A. and Del Buono, F. and Guerra, F. and Paganelli, M. and Vincini, M.},
+@inproceedings{Baraldi2023,
+  author    = {Baraldi, A. and others},
   title     = {An Intrinsically Interpretable Entity Matching System},
-  booktitle = {Proceedings of the International Conference on Extending Database Technology (EDBT)},
-  year      = {2023},
-  doi       = {10.48786/edbt.2023.54}
+  booktitle = {Proceedings of EDBT},
+  year      = {2023}
 }
 
-@inproceedings{Benassi2024Explaining,
-  author    = {Benassi, R. and Guerra, F. and Paganelli, M. and Tiano, D.},
+@inproceedings{Benassi2024,
+  author    = {Benassi, R. and others},
   title     = {Explaining Entity Matching with Clusters of Words},
-  booktitle = {Proceedings of the IEEE International Conference on Data Engineering (ICDE)},
-  pages     = {2325--2337},
-  year      = {2024},
-  doi       = {10.1109/ICDE60146.2024.00184}
+  booktitle = {Proceedings of IEEE ICDE},
+  year      = {2024}
 }
 
-@inproceedings{morris2020textattack,
-  title={Textattack: A framework for adversarial attacks, data augmentation, and adversarial training in nlp},
-  author={Morris, John and Lifland, Eli and Yoo, Jin Yong and Grigsby, Jake and Jin, Di and Qi, Yanjun},
-  booktitle={Proceedings of the 2020 conference on empirical methods in natural language processing: System demonstrations},
-  pages={119--126},
-  year={2020}  
-}
-
-@inproceedings{CREW2024,
-  author    = {Paganelli, Matteo and Baraldi, Andrea and Guerra, Francesco},
-  booktitle = {2024 IEEE 40th International Conference on Data Engineering (ICDE)}, 
-  title     = {Explaining Entity Matching with Clusters of Words}, 
-  year      = {2024},
-  pages     = {4940-4952},
-  doi       = {10.1109/ICDE59761.2024.00421}
-}
-
-@inproceedings{shap,
-  author    = {Lundberg, Scott M. and Lee, Su-In},
-  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
-  title     = {A Unified Approach to Interpreting Model Predictions},
-  year      = {2017}
-}
-
-@inproceedings{lime,
-  author    = {Ribeiro, Marco Tulio and Singh, Sameer and Guestrin, Carlos},
-  booktitle = {Proceedings of the 22nd ACM SIGKDD},
-  title     = {"Why Should I Trust You?": Explaining the Predictions of Any Classifier},
-  year      = {2016}
-}
-
-@article{wachter2017,
-  author  = {Wachter, Sandra and Mittelstadt, Brent and Russell, Chris},
-  journal = {Harvard Journal of Law \& Technology},
-  title   = {Counterfactual Explanations without Opening the Black Box: Automated Decisions and the GDPR},
-  year    = {2017},
-  volume  = {31}
-}
-
-@inproceedings{textattack2020,
-  title={TextAttack: A Framework for Adversarial Attacks, Data Augmentation, and Adversarial Training in NLP},
-  author={Morris, John and Lifland, Eli and Yoo, Jin Yong and Grndahl, Jake and Fawaz, Shanshan and Qi, Yanjun},
-  booktitle={Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing: System Demonstrations},
-  pages={119--126},
-  year={2020}
-}
-
-@inproceedings{textfooler2020,
-  title={Is BERT Really Robust? A Strong Baseline for Natural Language Attack on Text Classification and Entailment},
-  author={Jin, Di and Jin, Zhijing and Zhou, Joey Tianyi and Szolovits, Peter},
-  booktitle={Proceedings of the AAAI conference on artificial intelligence},
-  volume={34},
-  pages={8018--8025},
-  year={2020}
-}
-
-@inproceedings{thirumuruganathan2022,
-  author    = {Thirumuruganathan, Saravanan and Li, Han and Tang, Nan and Ouzzani, Mourad and Joty, Shafiq and Li, Guoliang},
-  title     = {Explaining Deep Entity Matching Decisions},
-  booktitle = {Proceedings of the 2022 International Conference on Management of Data (SIGMOD)},
-  pages     = {1444--1454},
-  year      = {2022},
-  publisher = {ACM}
-}
-
-@inproceedings{deepmatcher,
-  author    = {Mudgal, Sidharth and Li, Han and Rekatsinas, Theodoros and Doan, AnHai and Park, Youngchoon and Krishnan, Ganesh and Deep, Rohit and Arcaute, Esteban and Raghavendra, Vijay},
-  title     = {Deep Learning for Entity Matching: A Design Space Exploration},
-  booktitle = {Proceedings of the 2018 International Conference on Management of Data (SIGMOD)},
-  pages     = {19--34},
-  year      = {2018},
-  publisher = {ACM},
-  doi       = {10.1145/3183713.3196926}
-}
-
-@inproceedings{exmatchina2021,
-  author    = {Singh, Kushagra and Thirumuruganathan, Saravanan and Tang, Nan and Chiticariu, Laura},
-  title     = {ExMatchina: Explainable Entity Matching with Local Explanations},
-  booktitle = {Proceedings of the 2021 International Conference on Management of Data (SIGMOD)},
-  pages     = {1645--1657},
-  year      = {2021},
-  publisher = {ACM},
-  doi       = {10.1145/3448016.3457245}
-}
-
-@inproceedings{sundararajan2017axiomatic,
-  title={Axiomatic Attribution for Deep Networks},
-  author={Sundararajan, Mukund and Taly, Ankur and Yan, Qiqi},
-  booktitle={Proceedings of the 34th International Conference on Machine Learning},
-  year={2017}
-}
-
-@article{kokhlikyan2020captum,
-  title={Captum: A unified and generic model interpretability library for PyTorch},
-  author={Kokhlikyan, Narine and others},
-  journal={arXiv preprint arXiv:2009.07896},
-  year={2020}
-}
+% --- Saliency & Reliability ---
 
 @inproceedings{kindermans2019reliability,
-  title={The (Un)Reliability of Saliency Methods},
-  author={Kindermans, Pieter-Jan and others},
-  booktitle={Advances in Neural Information Processing Systems},
-  year={2019}
+  author    = {Kindermans, Pieter-Jan and others},
+  title     = {The (Un)Reliability of Saliency Methods},
+  booktitle = {Advances in NeurIPS},
+  year      = {2019}
 }
 
 @inproceedings{wallace2019trick,
-  title={Trick Me If You Can: Human-in-the-loop Generation of Adversarial Examples for Question Answering},
-  author={Wallace, Eric and others},
-  booktitle={Proceedings of ACL},
-  year={2019}
+  author    = {Wallace, Eric and others},
+  title     = {Trick Me If You Can: Adversarial Examples},
+  booktitle = {Proceedings of ACL},
+  year      = {2019}
 }

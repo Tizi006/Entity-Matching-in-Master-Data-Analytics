@@ -1,19 +1,27 @@
 \section{abstract}
-Entity Matching (EM) is a key task in today’s cloud-based data ecosystems, where data from 
-many heterogeneous sources must be reliably integrated. Recent EM approaches rely on 
-powerful black-box models, which achieve high accuracy but offer little transparency. 
-Existing explainability techniques are rarely applied to EM and face specific challenges: they 
-must cope with heterogeneous representations of entities, large volumes of data, and 
-explanations that often fail to capture the unique semantic characteristics of EM decisions. In 
-this project, we investigate explainable EM by applying black-box explainers such as SHAP, 
-LIME, and related methods to current EM models to one fixed model. 
+Entity Matching (EM) is a key task in today’s cloud-based data ecosystems, 
+where data from many heterogeneous sources must be reliably integrated. 
+Recent EM approaches rely on powerful black-box architectures, specifically 
+Transformer-based models, which achieve high accuracy but offer little 
+transparency. Existing explainability techniques are rarely applied to EM 
+and face specific challenges: they must cope with heterogeneous 
+representations of entities, large volumes of data, and explanations that 
+often fail to capture the unique semantic characteristics of EM decisions. 
+In this project, we investigate explainable EM by applying a diverse set 
+of black-box explainers—specifically \textbf{Integrated Gradients} 
+(via Captum), \textbf{LIME}, and \textbf{Adversarial Counterfactuals} 
+(via TextAttack)—to a fixed BERT-based matching model.
 
-Concretely, we run a set of benchmark EM datasets through a black-box model, generate 
-local explanations for its duplicate and non-duplicate predictions, and compare these 
-explanation methods with respect to fidelity, stability, and usability. We will further visualize 
-the explanations to make the decision process of the EM model accessible to human users. 
-The overall objective is to implement and evaluate interpretable methods that clearly explain 
-why two records are classified as duplicates or not, thereby increasing trust in EM systems 
-and supporting users in debugging, validating, and improving data integration pipelines. 
+Concretely, we run a set of benchmark EM datasets through our model, 
+generate local explanations for duplicate and non-duplicate predictions, 
+and compare these methods with respect to \textit{fidelity}, 
+\textit{stability}, and \textit{usability}. By evaluating 
+both gradient-based attribution and instance-based counterfactual flips, 
+we identify which approach best reflects the internal logic of the 
+transformer model while providing human-understandable insights. The 
+overall objective is to implement interpretable methods that clearly 
+justify why two records are classified as duplicates, thereby 
+increasing trust in EM systems and supporting users in debugging 
+and validating complex data integration pipelines.
 
-\keywords{Entity Matching  \and Explainable AI \and Black-Box.}
+\keywords{Entity Matching \and Explainable AI \and Transformers \and Counterfactuals.}
