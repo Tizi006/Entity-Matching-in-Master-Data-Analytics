@@ -16,29 +16,6 @@ from data_loader import (
 
 from EMCode.model.em_bert_model import EMModel
 
-'''
-Sowohl deepmatcher als auch ditto haben einige dependency-probleme verursacht (gerade deepmatcher hat einige probleme wegen älteren Pythonversionen und Linux-exclusives).
-Das hier ist ist jetzt ein Modell, welches ein pretrained model (BERT) verwendet. (Quasi wie Ditto)
-Vorteil:
-- keine nennenswerten dependency probleme
-- code läuft
-- 
-
-mögliche Nachteile:
-- wahrscheinlich etwas ungenauer (habe mich damit nicht besonders auseinander gesetzt)
-- mehr custom-code (kann man aber als mehraufwand verkaufen)
-- der code war bei mir sehr langsam...
-
-
-Mit Shap hatte ich auch ein paar dependency probleme (eig. nur python-Version).
-Bin deswegen auf Captum umgestiegen. (ist ähnlich zu SHAP (kann unter anderem auch gradient-shap))
-Es ist im gegenssatz zu shap nicht modelagnostisch, aber für deep-learning spezialisiert
-Hab damit noch nicht so viel gemacht...
-
-Vorteil (und evtl auch Nachteil):
-- ich hab noch nicht viel dazu gesehen
-'''
-
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer,
                               encoding='utf-8')  # evtl lieber nicht buffern, da man sonst erst am ende was sieht...
 
