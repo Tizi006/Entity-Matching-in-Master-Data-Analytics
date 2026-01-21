@@ -112,7 +112,7 @@ Consequently, we adopt \texttt{[MASK]} as the default baseline for all subsequen
 
 Integrated Gradients provides fine-grained attribution scores for each input token, allowing a detailed inspection of the model’s decision process. In the context of entity matching, each token receives a signed attribution value, where positive scores indicate evidence in favor of a match and negative scores indicate evidence against a match. The magnitude of the attribution reflects the strength of the token’s contribution to the final prediction.
 
-The input to the model consists of paired attribute columns for two entities, specifically \texttt{authors\_1}, \texttt{authors\_2}, \texttt{title\_1}, \texttt{title\_2}, \texttt{venue\_1}, \texttt{venue\_2}, \texttt{year\_1}, and \texttt{year\_2}. For transparency, the example shown in Figure~\ref{fig:ig_example} corresponds to the following entity pair:
+The input to the model consists of paired attribute columns for two entities, specifically \texttt{authors\_1}, \texttt{authors\_2}, \texttt{title\_1}, \texttt{title\_2}, \texttt{venue\_1}, \texttt{venue\_2}, \texttt{year\_1}, and \texttt{year\_2}. For transparency, the example shown in Figure~\ref{fig:igplot} corresponds to the following entity pair:
 
 \begin{quote}
 \small
@@ -132,9 +132,9 @@ In the visualization, a dedicated separator token (referred to as \emph{Trenner}
 
 Figure~\ref{fig:igplot} illustrates an example explanation produced using Integrated Gradients for this entity pair. The visualization shows the aggregated relevance scores per attribute column, providing an intuitive summary of the model’s reasoning.
 
-\begin{figure}[h]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=\linewidth]{../image/IGplot.png}
+    \includegraphics[width=\linewidth]{images/IGplot.png}
     \caption{Integrated Gradients explanation for an entity matching decision on a bibliographic record pair. Token-level attributions are aggregated per attribute column (e.g., authors, title, venue, year) to improve interpretability.}
     \label{fig:igplot}
 \end{figure}
